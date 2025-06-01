@@ -1,17 +1,10 @@
-const ws = new WebSocket('ws://localhost:8000')
+import { Router } from "../../framework/router.js";
+import { PageNotFound } from "../../framework/notfound.js";
+import { Home } from "./pages/home.js";
 
-ws.addEventListener("open", (e)=> {
-    console.log("connection opened!");
-})
+const router = new Router({
+  "/": Home,
+  "/404page": PageNotFound
+});
 
-ws.addEventListener('message',(e)=> {
-    console.log(e.data);
-})
-
-ws.addEventListener('error',(e)=> {
-    console.log("websocket error!");
-})
-
-ws.addEventListener('close',(e)=> {
-    console.log("websocket closed!");
-})
+export { router };
