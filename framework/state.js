@@ -1,4 +1,4 @@
-import { router } from "../src/main.js"
+import { router } from "../frontend/scripts/main.js"
 let states = [];
 let count = 0;
 
