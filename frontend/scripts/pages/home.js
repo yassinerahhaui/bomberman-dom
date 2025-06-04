@@ -1,27 +1,20 @@
-import { addNode } from "../../../framework/dom.js";
+import { ourFrame } from "../../../framework/dom.js";
 
 const Home = () => {
-    const HandleSubmit = (e) => {
-        e.preventDefault()
-        const formData = new FormData(e.target)
-    }
-  return addNode("main", { class: "main" }, [
-    addNode("h1", { class: "home-title" }, ["BOMBERMAN-DOM"]),
-    addNode("div", { class: "home-card" }, [
-      addNode("h3", { class: "home-card-title" }, ["Enter your name."]),
-      addNode("form", { method: "POST", class: "home-card-form", onsubmit: (e)=> HandleSubmit }, [
-        addNode('input',{
-            type: 'text',
-            name: 'name',
-            placeholder: 'what\'s your name?'
-        }),
-        addNode('button', {
-            type:'submit',
-            class: 'home-submit-btn'
-        },['submit'])
-      ]),
-    ]),
-  ]);
+  return ourFrame.createElement(
+    "main",
+    {
+      class: "main",
+    },
+    ourFrame.createElement('h1',{class:'title1'},'BOMBERMAN-DOM'),
+    ourFrame.createElement(
+      "div",
+      {
+        class: "card",
+      },
+      ourFrame.createElement("label",{for:''})
+    )
+  );
 };
 
 export { Home };

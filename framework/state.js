@@ -1,32 +1,49 @@
-import { router } from "../frontend/scripts/main.js"
 let states = [];
-let count = 0;
+let stateCursor = 0;
+let rerenderFn = null;
+let batchTimeout = null;
 
-const resetCount = () => count = 0;
-const reset = () => {
-  resetCount()
+function useState(initialValue) {
+  const currentIndex = stateCursor;
+
+  if (states[currentIndex] === undefined) {
+    states[currentIndex] = initialValue;
+  }
+  const currentValue = states[currentIndex];
+
+  function setState(newValue) {
+    const valueToSet = typeof newValue === "function" ? newValue(states[currentIndex]) : newValue;
+    const hasChanged = states[currentIndex] !== valueToSet;
+
+    if (hasChanged) {
+      states[currentIndex] = valueToSet;
+      if (typeof rerenderFn === "function") {
+        if (batchTimeout) clearTimeout(batchTimeout);
+        // Schedule rerender for after currenth render completes (batch updates)
+        batchTimeout = setTimeout(() => {
+          rerenderFn();
+        }, 0);
+        // }
+      } else {
+        console.warn("rerender function is not defined");
+      }
+    }
+  }
+
+  stateCursor++; // Move to next state index
+  return [currentValue, setState];
 }
 
-function useState(initialState) {
-  if (typeof states[count] == "undefined") {
-    states[count] = initialState;
-  }
-  const index = count;
-  // let state = states[index];
+function resetCursor() {
+  stateCursor = 0;
+}
 
-  const setState = (newValue) => {
-    if (typeof newValue == "function") {
-      states[index] = newValue(states[index])
-    } else {
-      states[index] = newValue;
-    }
-        
-    router.rerender()
-  };
-  count++;
-  return [states[index], setState];
+export function injectRerender(fn) {
+  rerenderFn = fn;
+}
+
+
+export const state = {
+  useState,
+  resetCursor,
 };
-
-
-
-export { useState, reset };
