@@ -5,8 +5,12 @@ const Home = () => {
     e.preventDefault()
     const formData = new FormData(e.target)
     const name = formData.get('name')
-    console.log(name)
-    e.target.reset()
+    if (name.trim().length > 0) {
+      console.log(name)
+      e.target.reset()
+    } else if (name.length > 0) {
+      e.target.reset()
+    }
   };
   
   return ourFrame.createElement(
