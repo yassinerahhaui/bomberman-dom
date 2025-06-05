@@ -1,10 +1,10 @@
-import { Router } from "../../framework/router.js";
-import { PageNotFound } from "../../framework/notfound.js";
-import { Home } from "./pages/home.js";
+import { Router } from "../../framework/Router.js";
+import Home from "./pages/home.js";
+import PageNotFound from "./pages/notfound.js";
 
 const router = new Router({
   "/": Home,
-  "/404page": PageNotFound
+  "/404": PageNotFound
 });
 
 export { router };
