@@ -3,7 +3,6 @@
 import { ourFrame } from "./dom.js";
 import { injectRerender } from "./state.js";
 
-
 export class Router {
   constructor(routes, rootElement) {
     this.routes = routes;
@@ -15,6 +14,14 @@ export class Router {
 
   init() {
     // Listen to navigation events
+    window.addEventListener("click", (e) => {
+      if (e.target.tagName === "A") {
+        e.preventDefault();
+        let pathName = e.target.getAttribute("href");
+        this.navigate(`${pathName}`);
+        this.rerender();
+      }
+    });
     injectRerender(this.rerender.bind(this));
     window.addEventListener("popstate", () => this.handleNavigation());
     window.addEventListener("navigation", () => this.handleNavigation());
@@ -41,7 +48,6 @@ export class Router {
 
     return null; // No match
   }
-
 
   render(component) {
     const newApp = component();
