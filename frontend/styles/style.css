@@ -22,11 +22,8 @@
 body {
     min-height: 100vh;
     background:
-        linear-gradient(120deg, rgba(26,26,64,0.98) 0%, rgba(124,92,252,0.85) 100%),
-        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80');
-    background-size: cover;
+        linear-gradient(135deg, var(--cl-1) 0%, var(--cl-2) 50%, var(--cl-3) 100%);
     background-attachment: fixed;
-    background-blend-mode: overlay;
     color: var(--cl-4);
     overflow-x: hidden;
 }
@@ -36,22 +33,16 @@ body {
     font-weight: 900;
     padding: 2.5rem 0 1.5rem 0;
     text-align: center;
-    text-shadow: 0 0 1.2rem var(--cl-accent), 0 0 .6rem var(--cl-3);
+    text-shadow: 0 0 1.2rem var(--cl-dark), 0 0 .6rem var(--cl-dark);
     letter-spacing: 0.12em;
     color: var(--cl-4);
     text-transform: uppercase;
     filter: drop-shadow(0 0 8px var(--cl-3));
-    animation: glow 2s infinite alternate;
-}
-
-@keyframes glow {
-    from { text-shadow: 0 0 1.2rem var(--cl-accent), 0 0 .6rem var(--cl-3);}
-    to { text-shadow: 0 0 2.2rem var(--cl-4), 0 0 1.2rem var(--cl-accent);}
 }
 
 .card {
-    width: 100%;
-    max-width: 44rem;
+    width: 90%;
+    max-width: 60rem;
     margin: 4rem auto;
     background: rgba(26, 26, 64, 0.92);
     border-radius: 1.6rem;
