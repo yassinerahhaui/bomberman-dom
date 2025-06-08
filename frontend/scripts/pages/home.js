@@ -2,17 +2,17 @@ import { ourFrame } from "../../../framework/dom.js";
 
 const Home = () => {
   const HandleSubmit = async (e) => {
-    e.preventDefault()
-    const formData = new FormData(e.target)
-    const name = formData.get('name')
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const name = formData.get("name");
     if (name.trim().length > 0) {
-      console.log(name)
-      e.target.reset()
+      console.log(name);
+      e.target.reset();
     } else if (name.length > 0) {
-      e.target.reset()
+      e.target.reset();
     }
   };
-  
+
   return ourFrame.createElement(
     "main",
     {
@@ -27,11 +27,17 @@ const Home = () => {
       ourFrame.createElement(
         "form",
         { method: "POST", onSubmit: HandleSubmit },
-        ourFrame.createElement("label", { for: "nameInput" }, "Name"),
+        ourFrame.createElement(
+          "label",
+          { for: "nameInput", class: "label-name" },
+          "Create Your Name:"
+        ),
         ourFrame.createElement("input", {
           type: "text",
-          name:'name',
+          name: "name",
+          class: "input-name",
           placeholder: "what's your name?",
+          autocomplete: "off",
           id: "nameInput",
         }),
         ourFrame.createElement(
