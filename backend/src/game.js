@@ -1,8 +1,12 @@
 const levelChars = {
   ".": "empty",
   "#": "wall",
+  "1": "player",
+  "2": "player",
+  "3": "player",
+  "4": "player",
 };
-class Level {
+var Level = class Level {
   /* convert string to slice */
   constructor(map) {
     let rows = map.trim.split("\n").map((line) => [...line]);
@@ -14,16 +18,30 @@ class Level {
         let type = levelChars[ch];
         if (typeof type === "string") return type;
         this.startActors.push(type.create(new Vec(x, y), ch));
+        return "empty"
       });
     });
   }
 }
 
-class Player {
-  constructor(position, speed) {}
+var Player = class Player {
+  constructor(pos, speed) {
+    this.pos = pos;
+    this.speed = speed;
+    this.size = new Vec(0.5, 0.9);
+  }
+
+  get type() {
+    return 'player';
+  }
+
+  static create(pos) {
+    return new Player(pos.plus(new Vec(0,0)), new Vec(0,0));
+  }
+
 }
 
-class Vec {
+var Vec = class Vec {
   constructor(x, y) {
     this.x = x;
     this.y = y;
