@@ -1,10 +1,11 @@
 const levelChars = {
   ".": "empty",
   "#": "wall",
-  "1": "player",
-  "2": "player",
-  "3": "player",
-  "4": "player",
+  "+": "break",
+  1: "player",
+  2: "player",
+  3: "player",
+  4: "player",
 };
 var Level = class Level {
   /* convert string to slice */
@@ -18,11 +19,11 @@ var Level = class Level {
         let type = levelChars[ch];
         if (typeof type === "string") return type;
         this.startActors.push(type.create(new Vec(x, y), ch));
-        return "empty"
+        return "empty";
       });
     });
   }
-}
+};
 
 var Player = class Player {
   constructor(pos, speed) {
@@ -32,14 +33,13 @@ var Player = class Player {
   }
 
   get type() {
-    return 'player';
+    return "player";
   }
 
   static create(pos) {
-    return new Player(pos.plus(new Vec(0,0)), new Vec(0,0));
+    return new Player(pos.plus(new Vec(0, 0)), new Vec(0, 0));
   }
-
-}
+};
 
 var Vec = class Vec {
   constructor(x, y) {
@@ -54,4 +54,72 @@ var Vec = class Vec {
   times(factor) {
     return new Vec(this.x * factor, this.y * factor);
   }
-}
+};
+
+const result = {
+  maps: {},
+  player1: {
+    name: "",
+    pos: {
+      x: 1,
+      y: 3,
+    },
+    state: {
+      status: "playing",
+      lives: 3,
+      power_ups: {
+        bombs: 1,
+        speed: 1,
+        flames: 1,
+      },
+    },
+  },
+  player2: {
+    name: "",
+    pos: {
+      x: 1,
+      y: 3,
+    },
+    state: {
+      status: "playing",
+      lives: 3,
+      power_ups: {
+        bombs: 1,
+        speed: 1,
+        flames: 1,
+      },
+    },
+  },
+  player3: {
+    name: "",
+    pos: {
+      x: 1,
+      y: 3,
+    },
+    state: {
+      status: "playing",
+      lives: 3,
+      power_ups: {
+        bombs: 1,
+        speed: 1,
+        flames: 1,
+      },
+    },
+  },
+  player4: {
+    name: "",
+    pos: {
+      x: 1,
+      y: 3,
+    },
+    state: {
+      status: "playing",
+      lives: 3,
+      power_ups: {
+        bombs: 1,
+        speed: 1,
+        flames: 1,
+      },
+    },
+  },
+};
