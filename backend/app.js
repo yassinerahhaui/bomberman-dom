@@ -17,13 +17,29 @@ const server = createServer((req, res) => {
 });
 
 const wss = new WebSocketServer({ server });
-
+var conns = []
 wss.on("connection", (ws) => {
-  console.log("new client enter");
+  /* 
+    Conn : conn + type + room_id + data
+  */
+  conns.push(ws)
 
-  ws.on("message", (message) => {
-    console.log(`Received message: ${message}`);
-    ws.send(`Echo: ${message}`);
+  ws.on("message", (msg) => {
+    switch (msg.type) {
+      case 'username':
+        
+        break;
+    
+      default:
+        break;
+    }
+    console.log(`Received message: ${msg}`);
+    conns.map(conn => {
+      if (conn != ws) {
+        conn.send(JSON.stringify(msg))
+      }
+    })
+    // ws.send(`Echo: ${message}`);
   });
 
   ws.on("close", () => {
