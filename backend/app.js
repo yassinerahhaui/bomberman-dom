@@ -1,45 +1,74 @@
 import { createServer } from "node:http";
-import { WebSocketServer } from 'ws';
+import { randomUUID } from "node:crypto";
+import { WebSocketServer } from "ws";
 
-const hostname = 'localhost';
+const hostname = "localhost";
 const port = 8000;
 
 const server = createServer((req, res) => {
-  if (req.method === 'GET' && req.url === '/api/hello') {
+  if (req.method === "GET" && req.url === "/api/hello") {
     res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ message: 'Hello from GET endpoint!' }));
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify({ message: "Hello from GET endpoint!" }));
   } else {
     res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Hello World');
+    res.setHeader("Content-Type", "text/plain");
+    res.end("Hello World");
   }
 });
 
 const wss = new WebSocketServer({ server });
-var conns = []
+let players = [];
+let room = [];
+let rooms = {};
+
 wss.on("connection", (ws) => {
   /* 
     Conn : conn + type + room_id + data
   */
-  conns.push(ws)
+  let player = {
+    conn: ws,
+    room_id: null,
+    name: null,
+  };
 
-  ws.on("message", (msg) => {
+  players.push(player);
+  ws.on("message", (message) => {
+    const buffer = new Uint8Array(message);
+    const jsonData = new TextDecoder().decode(buffer);
+    const msg = JSON.parse(jsonData);
+
     switch (msg.type) {
-      case 'username':
-        
+      case "username":
+        for (let pl of players) {
+          if (pl.conn == ws) {
+            pl.name = msg.name;
+            if (room.length < 4) { 
+              room.push(pl);
+              if (room.length == 4) { // if room complated
+                let uuid = randomUUID();
+                rooms[uuid] = room.map((pl) => {
+                  pl.room_id = uuid;
+                  return pl;
+                });
+                room = [];
+                console.log(rooms);
+              }
+            }
+            break;
+          }
+        }
         break;
-    
+
       default:
         break;
     }
-    console.log(`Received message: ${msg}`);
-    conns.map(conn => {
-      if (conn != ws) {
-        conn.send(JSON.stringify(msg))
+
+    players.forEach((pl) => {
+      if (pl.conn != ws) {
+        pl.conn.send(JSON.stringify(msg));
       }
-    })
-    // ws.send(`Echo: ${message}`);
+    });
   });
 
   ws.on("close", () => {
