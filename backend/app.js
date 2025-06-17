@@ -1,15 +1,17 @@
 import { createServer } from "node:http";
 import { randomUUID } from "node:crypto";
 import { WebSocketServer } from "ws";
+import { Level } from "./src/game.js";
+import { map } from "./src/maps.js";
 
 const hostname = "localhost";
 const port = 8000;
-
+const level = new Level(map)
 const server = createServer((req, res) => {
-  if (req.method === "GET" && req.url === "/api/hello") {
+  if (req.method === "GET" && req.url === "/api/maps") {
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({ message: "Hello from GET endpoint!" }));
+    res.end(JSON.stringify({"level": level}));
   } else {
     res.statusCode = 200;
     res.setHeader("Content-Type", "text/plain");
@@ -43,9 +45,10 @@ wss.on("connection", (ws) => {
         for (let pl of players) {
           if (pl.conn == ws) {
             pl.name = msg.name;
-            if (room.length < 4) { 
+            if (room.length < 4) {
               room.push(pl);
-              if (room.length == 4) { // if room complated
+              if (room.length == 4) {
+                // if room complated
                 let uuid = randomUUID();
                 rooms[uuid] = room.map((pl) => {
                   pl.room_id = uuid;
