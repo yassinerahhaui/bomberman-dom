@@ -18,10 +18,8 @@ const Home = () => {
     console.log("connection opened");
   });
   ws.addEventListener("message", async (e) => {
-    const dataRaw = JSON.parse(e.data)
-    const buffer = new Uint8Array(dataRaw.data)
-    const jsonData = new TextDecoder().decode(buffer)
-    const data = JSON.parse(jsonData)
+    const data = JSON.parse(e.data);
+    
     console.log(data);
   });
   return ourFrame.createElement(
