@@ -8,10 +8,14 @@ const hostname = "localhost";
 const port = 8000;
 const level = new Level(map)
 const server = createServer((req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // Allowed methods
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Allowed headers
+
   if (req.method === "GET" && req.url === "/api/maps") {
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({"level": level}));
+    res.end(JSON.stringify({ "level": level }));
   } else {
     res.statusCode = 200;
     res.setHeader("Content-Type", "text/plain");
@@ -29,15 +33,15 @@ wss.on("connection", (ws) => {
     Conn : conn + type + room_id + data
   */
 
- 
- var player;
+
+  var player;
   ws.on("message", (message) => {
     const buffer = new Uint8Array(message);
     const jsonData = new TextDecoder().decode(buffer);
     const msg = JSON.parse(jsonData);
     switch (msg.type) {
       case "username":
-        player = handlePlayer(msg,ws, users)
+        player = handlePlayer(msg, ws, users)
         break;
       case "game":
         // handle logic

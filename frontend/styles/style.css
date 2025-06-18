@@ -116,12 +116,51 @@ body {
     overflow: hidden;
 }
 
-.submit-btn:hover, .submit-btn:focus {
+.submit-btn:hover,
+.submit-btn:focus {
     background: linear-gradient(90deg, var(--cl-3) 0%, var(--cl-accent) 100%);
     transform: translateY(-3px) scale(1.05);
     box-shadow: 0 12px 36px 0 rgba(255, 61, 129, 0.22);
     filter: brightness(1.1);
 }
+
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #000;
+}
+
+.game-map {
+    display: grid;
+    grid-template-columns: repeat(33, 30px);
+    grid-template-rows: repeat(11, 30px);
+    gap: 1px;
+}
+
+.cell {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wall {
+    background: #666;
+    border: 1px solid #999;
+}
+
+.empty {
+    background: #222;
+}
+
+.player {
+    background: #f00;
+    border-radius: 50%;
+}
+
 @media (max-width: 700px) {
     .card {
         max-width: 95vw;
