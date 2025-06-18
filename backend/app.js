@@ -9,13 +9,36 @@ const port = 8000;
 const level = new Level(map)
 const server = createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // Allowed methods
+  // res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // Allowed methods
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Allowed headers
 
   if (req.method === "GET" && req.url === "/api/maps") {
-    res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify({ "level": level }));
+    res.statusCode = 200;
+  } else if (req.method === "POST" && req.url === "/api/checkname") {
+    let body = "";
+    req.on("data", chunk => {
+      body += chunk;
+    });
+    req.on("end", () => {
+      try {
+        const data = JSON.parse(body);
+        const name = data.name;
+        console.log(name);
+        
+        // Now you can use the 'name' variable to check uniqueness, etc.
+        // Example response:
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify({ ok: true }));
+      } catch (err) {
+        res.statusCode = 400;
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify({ ok: false, message: "Invalid JSON" }));
+      }
+    });
+    return;
   } else {
     res.statusCode = 200;
     res.setHeader("Content-Type", "text/plain");

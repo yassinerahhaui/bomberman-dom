@@ -1,27 +1,49 @@
 import { ourFrame } from "../../../framework/dom.js";
-
+import { router } from "../main.js";
 const Home = () => {
-  const ws = new WebSocket(`ws://localhost:8000`);
   const HandleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const name = formData.get("name");
-    if (name.trim().length > 0) {
-      console.log(name);
-      ws.send(JSON.stringify({ type: "username", name }));
+    const name = formData.get("name").trim();
+
+    if (!name) {
       e.target.reset();
-    } else if (name.length > 0) {
-      e.target.reset();
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8000/api/checkname', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ name })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        console.error(data.message || "Name check failed");
+        return;
+      }
+
+      // If name is OK, create WebSocket and send name
+      const ws = new WebSocket(`ws://localhost:8000`);
+      ws.addEventListener("open", () => {
+        ws.send(JSON.stringify({ type: "username", name }));
+      });
+      ws.addEventListener("message", (e) => {
+        const data = JSON.parse(e.data);
+        console.log(data);
+        // handle server response here (redirect, show error, etc.)
+      });
+
+      // e.target.reset();
+      router.navigate("/game")
+    } catch (error) {
+      console.error('Error checking name:', error);
     }
   };
-  ws.addEventListener("open", (e) => {
-    console.log("connection opened");
-  });
-  ws.addEventListener("message", async (e) => {
-    const data = JSON.parse(e.data);
-    
-    console.log(data);
-  });
   return ourFrame.createElement(
     "main",
     {
