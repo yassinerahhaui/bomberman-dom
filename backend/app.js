@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { randomUUID } from "node:crypto";
+import { handlePlayer, removePlayer } from "./src/players.js";
 import { WebSocketServer } from "ws";
 import { Level } from "./src/game.js";
 import { map } from "./src/maps.js";
@@ -20,61 +20,35 @@ const server = createServer((req, res) => {
 });
 
 const wss = new WebSocketServer({ server });
-let players = [];
-let room = [];
-let rooms = {};
-
+let users = {
+  rooms: {},
+  room: []
+}
 wss.on("connection", (ws) => {
   /* 
     Conn : conn + type + room_id + data
   */
-  let player = {
-    conn: ws,
-    room_id: null,
-    name: null,
-  };
 
-  players.push(player);
+ 
+ var player;
   ws.on("message", (message) => {
     const buffer = new Uint8Array(message);
     const jsonData = new TextDecoder().decode(buffer);
     const msg = JSON.parse(jsonData);
-
     switch (msg.type) {
       case "username":
-        for (let pl of players) {
-          if (pl.conn == ws) {
-            pl.name = msg.name;
-            if (room.length < 4) {
-              room.push(pl);
-              if (room.length == 4) {
-                // if room complated
-                let uuid = randomUUID();
-                rooms[uuid] = room.map((pl) => {
-                  pl.room_id = uuid;
-                  return pl;
-                });
-                room = [];
-                console.log(rooms);
-              }
-            }
-            break;
-          }
-        }
+        player = handlePlayer(msg,ws, users)
         break;
-
+      case "game":
+        // handle logic
+        break;
       default:
         break;
     }
-
-    players.forEach((pl) => {
-      if (pl.conn != ws) {
-        pl.conn.send(JSON.stringify(msg));
-      }
-    });
   });
 
   ws.on("close", () => {
+    removePlayer(users, player)
     console.log("Client disconnected");
   });
 });
