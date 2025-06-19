@@ -1,18 +1,27 @@
 import { ourFrame } from "../../../framework/dom.js";
 
 const Home = () => {
+  const ws = new WebSocket(`ws://localhost:8000`);
   const HandleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const name = formData.get("name");
     if (name.trim().length > 0) {
       console.log(name);
+      ws.send(JSON.stringify({ type: "username", name }));
       e.target.reset();
     } else if (name.length > 0) {
       e.target.reset();
     }
   };
-
+  ws.addEventListener("open", (e) => {
+    console.log("connection opened");
+  });
+  ws.addEventListener("message", async (e) => {
+    const data = JSON.parse(e.data);
+    
+    console.log(data);
+  });
   return ourFrame.createElement(
     "main",
     {

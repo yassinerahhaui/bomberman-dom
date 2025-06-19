@@ -10,7 +10,7 @@ const levelChars = {
 var Level = class Level {
   /* convert string to slice */
   constructor(map) {
-    let rows = map.trim.split("\n").map((line) => [...line]);
+    let rows = map.trim().split("\n").map((line) => [...line]);
     this.height = rows.length;
     this.width = rows[0].length;
     this.startActors = [];
@@ -18,7 +18,9 @@ var Level = class Level {
       return row.map((ch, x) => {
         let type = levelChars[ch];
         if (typeof type === "string") return type;
-        this.startActors.push(type.create(new Vec(x, y), ch));
+        if (type && typeof type.create === "function") {
+          this.startActors.push(type.create(new Vec(x, y), ch));
+        }
         return "empty";
       });
     });
@@ -123,3 +125,5 @@ const result = {
     },
   },
 };
+
+export {Level}
