@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { handlePlayer, removePlayer } from "./src/players.js";
+import { handlePlayer } from "./src/players.js";
 import { WebSocketServer } from "ws";
 import { Level } from "./src/game.js";
 import { map } from "./src/maps.js";
@@ -16,29 +16,6 @@ const server = createServer((req, res) => {
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify({ "level": level }));
     res.statusCode = 200;
-  } else if (req.method === "POST" && req.url === "/api/checkname") {
-    let body = "";
-    req.on("data", chunk => {
-      body += chunk;
-    });
-    req.on("end", () => {
-      try {
-        const data = JSON.parse(body);
-        const name = data.name;
-        console.log(name);
-        
-        // Now you can use the 'name' variable to check uniqueness, etc.
-        // Example response:
-        res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify({ ok: true }));
-      } catch (err) {
-        res.statusCode = 400;
-        res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify({ ok: false, message: "Invalid JSON" }));
-      }
-    });
-    return;
   } else {
     res.statusCode = 200;
     res.setHeader("Content-Type", "text/plain");
@@ -47,24 +24,30 @@ const server = createServer((req, res) => {
 });
 
 const wss = new WebSocketServer({ server });
-let users = {
-  rooms: {},
-  room: []
+// let users = {
+//   rooms: [],
+//   // room: []
+// }
+let game = {
+  rooms: [[]]
 }
 wss.on("connection", (ws) => {
   /* 
     Conn : conn + type + room_id + data
   */
 
-
-  var player;
+  // var player;
   ws.on("message", (message) => {
     const buffer = new Uint8Array(message);
     const jsonData = new TextDecoder().decode(buffer);
     const msg = JSON.parse(jsonData);
     switch (msg.type) {
       case "username":
-        player = handlePlayer(msg, ws, users)
+        console.log(msg);
+
+        handlePlayer(msg.name, ws, game)
+        console.log(ws.player);
+
         break;
       case "game":
         // handle logic
@@ -75,7 +58,27 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-    removePlayer(users, player)
+    // removePlayer(users, player)
+    if (ws.player && typeof ws.player.room_id === "number") {
+      const room = game.rooms[ws.player.room_id];
+      if (room) {
+        const idx = room.findIndex(p => p.conn === ws);
+        if (idx !== -1) {
+          const [removedPlayer] = room.splice(idx, 1);
+          // Notify remaining players in the room
+          room.forEach(p => {
+            p.conn.send(JSON.stringify({
+              type: "player_disconnected",
+              name: removedPlayer.name
+            }));
+          });
+          // Optionally, remove empty rooms
+          // if (room.length === 0) {
+          //   delete game.rooms[ws.player.room_id];
+          // }
+        }
+      }
+    }
     console.log("Client disconnected");
   });
 });
