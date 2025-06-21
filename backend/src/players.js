@@ -1,6 +1,18 @@
 import { randomUUID } from "node:crypto";
 
 let roomId = 0
+const broadcastPlayerCount = (room) => {
+  const count = room.length;
+  const names = room.map(p => p.name);
+  room.forEach(p => {
+    p.conn.send(JSON.stringify({
+      type: "player_count",
+      count,
+      names
+    }));
+  });
+};
+
 const handlePlayer = (name, ws, game) => {
   let player = {
     conn: ws,
@@ -14,6 +26,7 @@ const handlePlayer = (name, ws, game) => {
   // handle username
   if (game.rooms[roomId].length < 4) {
     game.rooms[roomId].push(player);
+    broadcastPlayerCount(game.rooms[roomId]);
     if (game.rooms[roomId].length === 4) {
       game.rooms.push([])
       roomId++

@@ -72,6 +72,8 @@ wss.on("connection", (ws) => {
               name: removedPlayer.name
             }));
           });
+          broadcastPlayerCount(room);
+
           // Optionally, remove empty rooms
           // if (room.length === 0) {
           //   delete game.rooms[ws.player.room_id];
