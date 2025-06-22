@@ -19,14 +19,15 @@ const Home = () => {
   ws.addEventListener("open", (e) => {
     console.log("connection opened");
   });
-  ws.handleAddingMessage = (e) => {
+  ws.onmessage = (e) => {
+
     const data = JSON.parse(e.data);
     if (data.type === "player_added") {
-      router.render(AttendPage)
+      router.navigate("/attend")
+      console.log(data);
     }
-    console.log(data);
   }
-  ws.addEventListener("message", ws.handleAddingMessage);
+  // ws.addEventListener("message", ws.handleMessage);
 
   return ourFrame.createElement(
     "main",

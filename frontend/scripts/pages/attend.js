@@ -14,25 +14,29 @@ const AttendPage = () => {
     const [gameStarted, setGameStarted] = state.useState(false);
 
     // Only add the event listener once
-    // ws.removeEventListener("message", ws.handleAddingMessage)
-    if (!ws._attendListenerAdded) {
-        ws.handleRoomState = (e) => {
-            const data = JSON.parse(e.data);
-            if (data.type === "room_state") {
-                setPlayerCount(data.playerCount);
-                setPlayerNames(data.playerNames);
-                setMainTimeLeft(data.mainTimeLeft);
-                setReadyTimeLeft(data.readyTimeLeft);
-                setMainTimerStarted(data.mainTimerStarted);
-                setReadyTimerStarted(data.readyTimerStarted);
-                setGameStarted(data.gameStarted);
-            }
-            // console.log(data);
-            
+    // if (ws.handleMessage) {
+    //     ws.removeEventListener("message", ws.handleMessage);
+    //     console.log("test");
+        
+    // }
+    // ws.removeEventListener("message", ws.handleMessage)
+    // if (!ws._attendListenerAdded) {
+    ws.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        if (data.type === "room_state") {
+            setPlayerCount(data.playerCount);
+            setPlayerNames(data.playerNames);
+            setMainTimeLeft(data.mainTimeLeft);
+            setReadyTimeLeft(data.readyTimeLeft);
+            setMainTimerStarted(data.mainTimerStarted);
+            setReadyTimerStarted(data.readyTimerStarted);
+            setGameStarted(data.gameStarted);
         }
-        ws.addEventListener("message", ws.handleRoomState);
-        ws._attendListenerAdded = true;
+
     }
+    // ws.addEventListener("message", ws.handleMessage);
+    // ws._attendListenerAdded = true;
+    // }
 
     let statusText = "";
     if (gameStarted) {
