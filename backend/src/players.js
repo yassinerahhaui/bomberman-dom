@@ -71,10 +71,29 @@ const handlePlayer = (name, ws, game) => {
   }))
 
   if (game.rooms[roomId].players.length < 4) {
-    game.rooms[roomId].players.push(player);
+    if (!game.rooms[roomId].gameStarted) {
+      game.rooms[roomId].players.push(player);
+    } else {
+      game.rooms.push(
+        {
+          players: [],
+          createdAt: Date.now(),
+          mainTimerStarted: false,
+          mainTimeLeft: 20,
+          readyTimerStarted: false,
+          readyTimeLeft: 10,
+          intervalId: null,
+          gameStarted: false,
+        }
+      )
+      roomId++
+      game.rooms[roomId].players.push(player);
+    }
+
     startMainTimer(game.rooms[roomId]);
 
-    if (game.rooms[roomId].players.length === 4 || game.rooms[roomId].gameStarted) {
+    if (game.rooms[roomId].players.length === 4) {
+      console.log("enter");
       game.rooms.push(
         {
           players: [],
