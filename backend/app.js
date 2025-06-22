@@ -24,12 +24,20 @@ const server = createServer((req, res) => {
 });
 
 const wss = new WebSocketServer({ server });
-// let users = {
-//   rooms: [],
-//   // room: []
-// }
+
 let game = {
-  rooms: [[]]
+  rooms: [
+    {
+      players: [],
+      createdAt: Date.now(),
+      mainTimerStarted: false,
+      mainTimeLeft: 20,
+      readyTimerStarted: false,
+      readyTimeLeft: 10,
+      intervalId: null,
+      gameStarted: false,
+    }
+  ]
 }
 wss.on("connection", (ws) => {
   /* 
@@ -43,10 +51,7 @@ wss.on("connection", (ws) => {
     const msg = JSON.parse(jsonData);
     switch (msg.type) {
       case "username":
-        console.log(msg);
-
         handlePlayer(msg.name, ws, game)
-        console.log(ws.player);
 
         break;
       case "game":
@@ -62,17 +67,17 @@ wss.on("connection", (ws) => {
     if (ws.player && typeof ws.player.room_id === "number") {
       const room = game.rooms[ws.player.room_id];
       if (room) {
-        const idx = room.findIndex(p => p.conn === ws);
+        const idx = room.players.findIndex(p => p.conn === ws);
         if (idx !== -1) {
-          const [removedPlayer] = room.splice(idx, 1);
+          const [removedPlayer] = room.players.splice(idx, 1);
           // Notify remaining players in the room
-          room.forEach(p => {
+          room.players.forEach(p => {
             p.conn.send(JSON.stringify({
               type: "player_disconnected",
               name: removedPlayer.name
             }));
           });
-          broadcastPlayerCount(room);
+          // broadcastPlayerCount(room.players);
 
           // Optionally, remove empty rooms
           // if (room.length === 0) {

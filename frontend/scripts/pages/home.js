@@ -1,8 +1,9 @@
 import { ourFrame } from "../../../framework/dom.js";
 import { router } from "../main.js";
+import AttendPage from "./attend.js"
+import { ws } from "../main.js";
 
 const Home = () => {
-  const ws = new WebSocket(`ws://localhost:8000`);
   const HandleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -18,11 +19,15 @@ const Home = () => {
   ws.addEventListener("open", (e) => {
     console.log("connection opened");
   });
-  ws.addEventListener("message", async (e) => {
+  ws.handleAddingMessage = (e) => {
     const data = JSON.parse(e.data);
-
+    if (data.type === "player_added") {
+      router.render(AttendPage)
+    }
     console.log(data);
-  });
+  }
+  ws.addEventListener("message", ws.handleAddingMessage);
+
   return ourFrame.createElement(
     "main",
     {

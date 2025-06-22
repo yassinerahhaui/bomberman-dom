@@ -1,17 +1,58 @@
 import { randomUUID } from "node:crypto";
 
 let roomId = 0
-const broadcastPlayerCount = (room) => {
-  const count = room.length;
-  const names = room.map(p => p.name);
-  room.forEach(p => {
-    p.conn.send(JSON.stringify({
-      type: "player_count",
-      count,
-      names
-    }));
-  });
-};
+
+function broadcastRoomState(room) {
+  const state = {
+    type: "room_state",
+    playerCount: room.players.length,
+    playerNames: room.players.map(p => p.name),
+    mainTimeLeft: room.mainTimeLeft,
+    readyTimeLeft: room.readyTimeLeft,
+    mainTimerStarted: room.mainTimerStarted,
+    readyTimerStarted: room.readyTimerStarted,
+    gameStarted: room.gameStarted,
+  };
+  room.players.forEach(p => p.conn.send(JSON.stringify(state)));
+}
+
+function startMainTimer(room) {
+  if (room.mainTimerStarted) return;
+  room.mainTimerStarted = true;
+  room.mainTimeLeft = 20;
+  room.intervalId = setInterval(() => {
+    room.mainTimeLeft--;
+    broadcastRoomState(room);
+    if (room.mainTimeLeft <= 0) {
+      if (room.players.length === 1) {
+        room.mainTimeLeft = 20
+        broadcastRoomState(room);
+        return
+      }
+      clearInterval(room.intervalId);
+      room.intervalId = null;
+      startReadyTimer(room);
+    }
+  }, 1000);
+}
+
+function startReadyTimer(room) {
+  if (room.readyTimerStarted) return;
+  room.readyTimerStarted = true;
+  room.readyTimeLeft = 10;
+  room.intervalId = setInterval(() => {
+    room.readyTimeLeft--;
+    broadcastRoomState(room);
+    if (room.readyTimeLeft <= 0) {
+      clearInterval(room.intervalId);
+      room.intervalId = null;
+      room.gameStarted = true;
+      broadcastRoomState(room);
+      //trigger game start logic here
+    }
+  }, 1000);
+}
+
 
 const handlePlayer = (name, ws, game) => {
   let player = {
@@ -20,29 +61,37 @@ const handlePlayer = (name, ws, game) => {
     room_id: roomId,
     name: null,
   };
+
   ws.player = { name: name, room_id: roomId };
   player.name = name;
   player.player_id = randomUUID()
-  // handle username
-  if (game.rooms[roomId].length < 4) {
-    game.rooms[roomId].push(player);
-    broadcastPlayerCount(game.rooms[roomId]);
-    if (game.rooms[roomId].length === 4) {
-      game.rooms.push([])
+
+  ws.send(JSON.stringify({
+    type: "player_added"
+  }))
+
+  if (game.rooms[roomId].players.length < 4) {
+    game.rooms[roomId].players.push(player);
+    startMainTimer(game.rooms[roomId]);
+
+    if (game.rooms[roomId].players.length === 4 || game.rooms[roomId].gameStarted) {
+      game.rooms.push(
+        {
+          players: [],
+          createdAt: Date.now(),
+          mainTimerStarted: false,
+          mainTimeLeft: 20,
+          readyTimerStarted: false,
+          readyTimeLeft: 10,
+          intervalId: null,
+          gameStarted: false,
+        }
+      )
       roomId++
     }
   }
 };
 
-// const removePlayer = (users, player) => {
-//   if (player.room_id != null) {
-//     users.rooms[player.room_id] = users.rooms[player.room_id].filter(pl => pl.conn != player.conn)
-//     if (users.rooms[player.room_id].length == 0) {
-//       delete users.rooms[player.room_id];
-//     }
-//   } else {
-//     users.room = users.room.filter(pl => pl.conn != player.conn)
-//   }
-// }
+
 
 export { handlePlayer };

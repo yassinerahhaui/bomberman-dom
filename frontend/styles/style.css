@@ -161,6 +161,46 @@ body {
     border-radius: 50%;
 }
 
+/* Attend page styles */
+.attend-card {
+  min-width: 320px;
+  max-width: 400px;
+  margin: 2rem auto;
+  background: rgba(26, 26, 64, 0.97);
+  border-radius: 1.2rem;
+  box-shadow: 0 8px 24px 0 rgba(124, 92, 252, 0.18), 0 0 0 2px var(--cl-3);
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid var(--cl-accent);
+  position: relative;
+}
+
+.attend-status {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--cl-4);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.attend-list {
+  list-style: none;
+  width: 100%;
+  padding: 0;
+}
+
+.attend-player {
+  font-size: 1.5rem;
+  color: var(--cl-light);
+  background: rgba(124, 92, 252, 0.12);
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+  padding: 0.7rem 1.2rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(26, 26, 64, 0.08);
+}
 @media (max-width: 700px) {
     .card {
         max-width: 95vw;

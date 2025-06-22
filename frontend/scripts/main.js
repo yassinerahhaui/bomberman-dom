@@ -3,10 +3,12 @@ import Home from "./pages/home.js";
 import PageNotFound from "./pages/notfound.js";
 import Game from "./pages/game.js";
 
+ const ws = new WebSocket(`ws://localhost:8000`);
+
 const router = new Router({
   "/": Home,
-  "/game": Game,
+  // "/game": Game,
   "/404": PageNotFound
 });
 
-export { router };
+export { router , ws};
