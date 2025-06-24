@@ -2,10 +2,10 @@ const levelChars = {
   ".": "empty",
   "#": "wall",
   "+": "break",
-  1: "player",
-  2: "player",
-  3: "player",
-  4: "player",
+  1: Player,
+  2: Player,
+  3: Player,
+  4: Player,
 };
 var Level = class Level {
   /* convert string to slice */

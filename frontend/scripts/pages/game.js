@@ -28,7 +28,7 @@ function Game() {
     }
 
     function renderCell(cellType) {
-        return ourFrame.createElement('div', {
+        return ourFrame.createElement('td', {
             class: `cell ${cellType}`,
         });
     }
@@ -40,9 +40,9 @@ function Game() {
         }
         console.log(gameMap);
 
-        return ourFrame.createElement('div',
+        return ourFrame.createElement('table',
             { class: 'game-map' },
-            ...gameMap.rows.flat().map(cell => renderCell(cell))
+            ...gameMap.rows.map(row => ourFrame.createElement('tr',{class: 'row'}, ...row.map(cell=> renderCell(cell))))
         );
     }
 
