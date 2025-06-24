@@ -142,6 +142,7 @@ body {
 
 table {
     border-spacing: 0;
+    background: #222;
 }
 
 
@@ -163,8 +164,13 @@ table {
 }
 
 .player {
-    background: #f00;
-    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+}
+.player-img {
+    width: 600px;
+    position: absolute;
+    left: 0;
 }
 
 /* Attend page styles */
