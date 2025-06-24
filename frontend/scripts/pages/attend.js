@@ -4,6 +4,9 @@ import { state } from "../../../framework/state.js";
 
 
 const AttendPage = () => {
+    if (!ws) {
+       return  ourFrame.createElement(null, null, null)
+    }
     state.resetCursor()
     const [playerCount, setPlayerCount] = state.useState(1);
     const [playerNames, setPlayerNames] = state.useState([]);
