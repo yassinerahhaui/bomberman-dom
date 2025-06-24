@@ -1,5 +1,5 @@
 import { ourFrame } from "../../../framework/dom.js"
-import { ws } from "../main.js"
+import { router, ws } from "../main.js"
 import { state } from "../../../framework/state.js";
 
 
@@ -17,7 +17,7 @@ const AttendPage = () => {
     // if (ws.handleMessage) {
     //     ws.removeEventListener("message", ws.handleMessage);
     //     console.log("test");
-        
+
     // }
     // ws.removeEventListener("message", ws.handleMessage)
     // if (!ws._attendListenerAdded) {
@@ -40,7 +40,9 @@ const AttendPage = () => {
 
     let statusText = "";
     if (gameStarted) {
+        
         statusText = "Game starting!";
+        router.navigate("/game")
         // Optionally redirect to game page here
         // window.location.hash = "#/game";
     } else if (readyTimerStarted) {

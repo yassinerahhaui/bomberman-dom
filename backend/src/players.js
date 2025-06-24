@@ -49,6 +49,7 @@ function startReadyTimer(room) {
       room.gameStarted = true;
       broadcastRoomState(room);
       //trigger game start logic here
+      
     }
   }, 1000);
 }
@@ -71,7 +72,7 @@ const handlePlayer = (name, ws, game) => {
   }))
 
   if (game.rooms[roomId].players.length < 4) {
-    if (!game.rooms[roomId].gameStarted) {
+    if (!game.rooms[roomId].readyTimerStarted) {
       game.rooms[roomId].players.push(player);
     } else {
       game.rooms.push(
@@ -93,7 +94,6 @@ const handlePlayer = (name, ws, game) => {
     startMainTimer(game.rooms[roomId]);
 
     if (game.rooms[roomId].players.length === 4) {
-      console.log("enter");
       game.rooms.push(
         {
           players: [],

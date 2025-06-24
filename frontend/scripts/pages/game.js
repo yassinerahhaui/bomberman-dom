@@ -19,6 +19,8 @@ function Game() {
             }
 
             const data = await response.json();
+            console.log(data.level);
+
             setGameMap(data.level);
         } catch (error) {
             console.error('Error fetching map:', error);
@@ -36,6 +38,7 @@ function Game() {
             fetchMap();
             return ourFrame.createElement('div', null, 'Loading...');
         }
+        console.log(gameMap);
 
         return ourFrame.createElement('div',
             { class: 'game-map' },

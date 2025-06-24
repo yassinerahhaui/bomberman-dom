@@ -7,6 +7,7 @@ import { map } from "./src/maps.js";
 const hostname = "localhost";
 const port = 8000;
 const level = new Level(map)
+
 const server = createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
   // res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // Allowed methods
@@ -43,7 +44,6 @@ wss.on("connection", (ws) => {
   /* 
     Conn : conn + type + room_id + data
   */
-
   // var player;
   ws.on("message", (message) => {
     const buffer = new Uint8Array(message);
@@ -80,9 +80,9 @@ wss.on("connection", (ws) => {
           // broadcastPlayerCount(room.players);
 
           // Optionally, remove empty rooms
-          // if (room.length === 0) {
-          //   delete game.rooms[ws.player.room_id];
-          // }
+          if (room.length === 0) {
+            delete game.rooms[ws.player.room_id];
+          }
         }
       }
     }

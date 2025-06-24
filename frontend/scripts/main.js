@@ -8,7 +8,7 @@ const ws = new WebSocket(`ws://localhost:8000`);
 
 const router = new Router({
   "/": Home,
-  // "/game": Game,
+  "/game": Game,
   "/attend": AttendPage,
   "/404": PageNotFound
 });
