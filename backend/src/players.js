@@ -49,7 +49,7 @@ function startReadyTimer(room) {
       room.gameStarted = true;
       broadcastRoomState(room);
       //trigger game start logic here
-      
+
     }
   }, 1000);
 }
@@ -63,16 +63,17 @@ const handlePlayer = (name, ws, game) => {
     name: null,
   };
 
-  ws.player = { name: name, room_id: roomId };
   player.name = name;
   player.player_id = randomUUID()
 
   ws.send(JSON.stringify({
-    type: "player_added"
+    type: "player_added",
+    playerId: player.player_id
   }))
 
   if (game.rooms[roomId].players.length < 4) {
     if (!game.rooms[roomId].readyTimerStarted) {
+      ws.player = { name: name, room_id: roomId, playerId: player.player_id };
       game.rooms[roomId].players.push(player);
     } else {
       game.rooms.push(
@@ -88,6 +89,7 @@ const handlePlayer = (name, ws, game) => {
         }
       )
       roomId++
+      ws.player = { name: name, room_id: roomId, playerId: player.player_id };
       game.rooms[roomId].players.push(player);
     }
 

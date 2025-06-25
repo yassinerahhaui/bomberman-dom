@@ -54,6 +54,22 @@ wss.on("connection", (ws) => {
         handlePlayer(msg.name, ws, game)
 
         break;
+      case "chat":
+        // Broadcast chat message to all players in the room
+        if (ws.player && typeof ws.player.room_id === "number") {
+          const room = game.rooms[ws.player.room_id];
+          if (room) {
+            room.players.forEach(p => {
+              p.conn.send(JSON.stringify({
+                type: "chat",
+                playerId : ws.player.playerId,
+                name: ws.player.name,
+                text: msg.text
+              }));
+            });
+          }
+        }
+        break;
       case "game":
         // handle logic
         break;

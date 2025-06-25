@@ -26,8 +26,8 @@ const Home = () => {
 
     const data = JSON.parse(e.data);
     if (data.type === "player_added") {
+      ws.playerId = data.playerId
       router.navigate("/attend")
-      console.log(data);
     }
   }
   // ws.addEventListener("message", ws.handleMessage);

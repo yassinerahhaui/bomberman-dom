@@ -5,7 +5,7 @@ import { state } from "../../../framework/state.js";
 
 const AttendPage = () => {
     if (!ws) {
-       return  ourFrame.createElement(null, null, null)
+        return ourFrame.createElement(null, null, null)
     }
     // state.resetCursor()
     const [playerCount, setPlayerCount] = state.useState(1);
@@ -15,15 +15,13 @@ const AttendPage = () => {
     const [mainTimerStarted, setMainTimerStarted] = state.useState(false);
     const [readyTimerStarted, setReadyTimerStarted] = state.useState(false);
     const [gameStarted, setGameStarted] = state.useState(false);
+    // const [playerId, setPlayerddId] = state.useState(""); 
 
-    // Only add the event listener once
-    // if (ws.handleMessage) {
-    //     ws.removeEventListener("message", ws.handleMessage);
-    //     console.log("test");
 
-    // }
-    // ws.removeEventListener("message", ws.handleMessage)
-    // if (!ws._attendListenerAdded) {
+    // Chat state
+    const [chatMessages, setChatMessages] = state.useState([]);
+    const [chatInput, setChatInput] = state.useState("");
+
     ws.onmessage = (e) => {
         const data = JSON.parse(e.data);
         if (data.type === "room_state") {
@@ -34,28 +32,39 @@ const AttendPage = () => {
             setMainTimerStarted(data.mainTimerStarted);
             setReadyTimerStarted(data.readyTimerStarted);
             setGameStarted(data.gameStarted);
+        } else if (data.type === "chat") {
+            console.log(data.playerId);
+            console.log(ws.playerId);
+            
+            
+            setChatMessages(msgs => [...msgs, { name: data.name, playerId: data.playerId, text: data.text }]);
         }
 
     }
-    // ws.addEventListener("message", ws.handleMessage);
-    // ws._attendListenerAdded = true;
-    // }
 
     let statusText = "";
     if (gameStarted) {
-        
         statusText = "Game starting!";
-   setTimeout(() => router.navigate("/game"), 0);
-
         router.navigate("/game")
-        // Optionally redirect to game page here
-        // window.location.hash = "#/game";
     } else if (readyTimerStarted) {
         statusText = `Get ready! Game starts in ${readyTimeLeft}s`;
     } else if (mainTimerStarted) {
         statusText = `Waiting for players: ${playerCount}/4 (${mainTimeLeft}s left)`;
     } else {
         statusText = `Waiting for players: ${playerCount}/4`;
+    }
+
+    // Chat input handler
+    function handleChatInput(e) {
+        setChatInput(e.target.value);
+    }
+
+    function handleChatSend(e) {
+        e.preventDefault();
+        if (chatInput.trim() && ws) {
+            ws.send(JSON.stringify({ type: "chat", text: chatInput.trim() }));
+            setChatInput("");
+        }
     }
 
     return ourFrame.createElement(
@@ -72,9 +81,46 @@ const AttendPage = () => {
                 ...playerNames.map(name =>
                     ourFrame.createElement("li", { class: "attend-player" }, name)
                 )
+            ),
+            // --- Chat Section ---
+            ourFrame.createElement(
+                "div",
+                { class: "chat-section" },
+                ourFrame.createElement("h2", null, "Room Chat"),
+                ourFrame.createElement(
+                    "div",
+                    { class: "chat-messages" },
+                    ...chatMessages.map(msg =>
+                        ourFrame.createElement(
+                            "div",
+                            {
+                                class: `chat-message ${msg.playerId === ws.playerId ? "sent" : "received"}`
+
+                            },
+                            ourFrame.createElement("span", { class: "chat-author" }, msg.playerId === ws.playerId ? "You" : msg.name),
+                            ourFrame.createElement("span", { class: "chat-text" }, msg.text)
+                        )
+                    )
+                ),
+                ourFrame.createElement(
+                    "form",
+                    {
+                        class: "chat-form",
+                        onsubmit: handleChatSend,
+                    },
+                    ourFrame.createElement("input", {
+                        type: "text",
+                        value: chatInput,
+                        oninput: handleChatInput,
+                        placeholder: "Type a message...",
+                        class: "chat-input"
+                    }),
+                    ourFrame.createElement("button", { type: "submit", class: "chat-send-btn" }, "Send")
+                )
             )
         )
     );
+
 };
 
 export default AttendPage;
