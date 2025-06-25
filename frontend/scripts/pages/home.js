@@ -4,7 +4,9 @@ import AttendPage from "./attend.js"
 import { ws, setWs } from "../main.js";
 
 const Home = () => {
-  setWs(new WebSocket(`ws://localhost:8000`));
+  if (!ws) {
+    setWs(new WebSocket(`ws://localhost:8000`));
+  }
   const HandleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);

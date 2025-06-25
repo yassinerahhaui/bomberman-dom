@@ -7,10 +7,9 @@ let imageWidth = 50 * 12 // cell width * 12
 let playerWidth = 600 / 12 // player image width / 12
 
 function Game() {
-    if (!ws) {
-        return ourFrame.createElement(null, null, null)
-    }
-    state.resetCursor();
+    // if (!ws) {
+    //     return ourFrame.createElement(null, null, null)
+    // }
     const [gameMap, setGameMap] = state.useState(null);
     async function fetchMap() {
         try {

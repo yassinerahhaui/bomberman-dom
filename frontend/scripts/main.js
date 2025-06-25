@@ -16,7 +16,7 @@ const router = new Router({
   "/404": PageNotFound
 });
 
-if (!ws) {
-  router.navigate("/")
-}
+// if (!ws) {
+//   router.navigate("/")
+// }
 export { router, ws, setWs };

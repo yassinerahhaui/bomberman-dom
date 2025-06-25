@@ -4,6 +4,7 @@ let rerenderFn = null;
 let batchTimeout = null;
 
 function useState(initialValue) {
+  // console.log(stateCursor);
   const currentIndex = stateCursor;
 
   if (states[currentIndex] === undefined) {
@@ -42,8 +43,13 @@ export function injectRerender(fn) {
   rerenderFn = fn;
 }
 
+function clearStates() {
+  states = [];
+  stateCursor = 0;
+}
 
 export const state = {
   useState,
   resetCursor,
+  clearStates
 };

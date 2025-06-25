@@ -7,7 +7,7 @@ const AttendPage = () => {
     if (!ws) {
        return  ourFrame.createElement(null, null, null)
     }
-    state.resetCursor()
+    // state.resetCursor()
     const [playerCount, setPlayerCount] = state.useState(1);
     const [playerNames, setPlayerNames] = state.useState([]);
     const [mainTimeLeft, setMainTimeLeft] = state.useState(20);
@@ -45,6 +45,8 @@ const AttendPage = () => {
     if (gameStarted) {
         
         statusText = "Game starting!";
+   setTimeout(() => router.navigate("/game"), 0);
+
         router.navigate("/game")
         // Optionally redirect to game page here
         // window.location.hash = "#/game";

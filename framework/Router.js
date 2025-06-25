@@ -1,7 +1,7 @@
 // Router.js
 
 import { ourFrame } from "./dom.js";
-import { injectRerender } from "./state.js";
+import { injectRerender, state } from "./state.js";
 
 export class Router {
   constructor(routes, rootElement) {
@@ -52,7 +52,7 @@ export class Router {
   render(component) {
     const newApp = component();
     // console.log(newApp);
-
+    state.resetCursor();
     if (this.currentApp) {
       ourFrame.patch(this.rootElement, this.currentApp, newApp);
     } else {
@@ -74,7 +74,7 @@ export class Router {
     } else {
       window.history.pushState(null, "", to);
     }
-
+    state.clearStates()
     // Trigger navigation event
     window.dispatchEvent(new CustomEvent("navigation"));
   }
