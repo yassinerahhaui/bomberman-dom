@@ -51,7 +51,9 @@ export function diff(oldTree, newTree) {
         if (i < dom.childNodes.length && !removedIndices.has(i)) {
           diff(oldChildren[i], newChildren[i])(dom.childNodes[i]);
         } else {
-          dom.appendChild(createElement(newChildren[i]));
+          if (newChildren[i]) {
+            dom.appendChild(createElement(newChildren[i]));
+          }
         }
       } else if (i < newChildren.length) {
         dom.appendChild(createElement(newChildren[i]));
@@ -193,8 +195,14 @@ function render(element, container) {
   return dom;
 }
 
+function selectEl(name) {
+  const el = document.querySelector(name)
+  return el;
+}
+
 export const ourFrame = {
   createElement: createVElement,
   render,
   patch,
+  selectEl,
 };
