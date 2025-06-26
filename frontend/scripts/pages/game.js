@@ -4,14 +4,16 @@ import { ws } from "../main.js";
 
 let imageWidth = 50 * 12; // cell width * 12
 let playerWidth = 600 / 12; // player image width / 12
+let scale = 50;
 
 function Game() {
-  // if (!ws) {
-  //     return ourFrame.createElement(null, null, null)
-  // }
+  if (!ws) {
+    return ourFrame.createElement(null, null, null);
+  }
   const [gameMap, setGameMap] = state.useState(null);
   const [left, setLeft] = state.useState(0);
   const [top, setTop] = state.useState(0);
+
   async function fetchMap() {
     try {
       const response = await fetch("http://localhost:8000/api/maps", {
@@ -60,16 +62,35 @@ function Game() {
 
     return ourFrame.createElement(
       "table",
-      { class: "game-map" },
+      { class: "game-map", style: `width: ${scale * gameMap.width}px` },
       ...gameMap.rows.map((row) =>
         ourFrame.createElement(
           "tr",
-          { class: "row" },
+          { class: "row", style: `height: ${scale}px` },
           ...row.map((cell) => renderCell(cell))
         )
       )
     );
   }
+
+  function goLeft() {
+    setTop(-(playerWidth * 2));
+    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  }
+  function goRight() {
+    setTop(-(playerWidth * 5));
+    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  }
+  function goUp() {
+    setTop(-playerWidth);
+    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  }
+  function goDown() {
+    setTop(0);
+    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  }
+
+  ws.onmessage = (e) => console.log(e.data);
 
   return ourFrame.createElement(
     "div",
@@ -80,32 +101,25 @@ function Game() {
         switch (e.key) {
           case "ArrowUp":
           case "w":
-            setTop(-playerWidth);
-            left > -(playerWidth * 2)
-              ? setLeft((l) => (l -= playerWidth))
-              : setLeft(0);
+          case "z":
+            goUp();
+            ws.send(JSON.stringify({ type: "game", action: "ArrowUp" }));
             break;
           case "ArrowDown":
           case "s":
-            setTop(0);
-            left > -(playerWidth * 2)
-              ? setLeft((l) => (l -= playerWidth))
-              : setLeft(0);
+            goDown();
+            ws.send(JSON.stringify({ type: "game", action: "ArrowDown" }));
             break;
           case "ArrowLeft":
           case "a":
-            setTop(-(playerWidth * 2));
-            left > -(playerWidth * 2)
-              ? setLeft((l) => (l -= playerWidth))
-              : setLeft(0);
+          case "q":
+            goLeft();
+            ws.send(JSON.stringify({ type: "game", action: "ArrowLeft" }));
             break;
           case "ArrowRight":
           case "d":
-            setTop(-(playerWidth * 5));
-            left > -(playerWidth * 2)
-              ? setLeft((l) => (l -= playerWidth))
-              : setLeft(0);
-
+            goRight();
+            ws.send(JSON.stringify({ type: "game", action: "ArrowRight" }));
             break;
           case " ":
             // bomb logic
