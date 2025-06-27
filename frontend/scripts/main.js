@@ -4,7 +4,7 @@ import PageNotFound from "./pages/notfound.js";
 import Game from "./pages/game.js";
 import AttendPage from "./pages/attend.js";
 
-let ws = null;  
+let ws = new WebSocket(`ws://localhost:8000`);  
 function setWs(newWs) {
   ws = newWs;
 }

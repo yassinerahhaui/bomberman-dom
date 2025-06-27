@@ -12,7 +12,6 @@ const Home = () => {
     const formData = new FormData(e.target);
     const name = formData.get("name");
     if (name.trim().length > 0) {
-      console.log(name);
       ws.send(JSON.stringify({ type: "username", name: name }));
       e.target.reset();
     } else if (name.length > 0) {

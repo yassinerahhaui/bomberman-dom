@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import { handlePlayer } from "./src/players.js";
 import { WebSocketServer } from "ws";
 import { Level } from "./src/game.js";
+import { map as mapString } from "./src/maps.js";
 import { map } from "./src/maps.js";
 
 const hostname = "localhost";
@@ -9,6 +10,8 @@ const port = 8000;
 const level = new Level(map)
 
 const server = createServer((req, res) => {
+// console.log(level);
+
   res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
   // res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // Allowed methods
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Allowed headers
@@ -37,14 +40,12 @@ let game = {
       readyTimeLeft: 10,
       intervalId: null,
       gameStarted: false,
+      map: new Level(mapString),
+
     }
   ]
 }
 wss.on("connection", (ws) => {
-  /* 
-    Conn : conn + type + room_id + data
-  */
-  // var player;
   ws.on("message", (message) => {
     const buffer = new Uint8Array(message);
     const jsonData = new TextDecoder().decode(buffer);
@@ -52,7 +53,6 @@ wss.on("connection", (ws) => {
     switch (msg.type) {
       case "username":
         handlePlayer(msg.name, ws, game)
-
         break;
       case "chat":
         // Broadcast chat message to all players in the room
@@ -62,7 +62,7 @@ wss.on("connection", (ws) => {
             room.players.forEach(p => {
               p.conn.send(JSON.stringify({
                 type: "chat",
-                playerId : ws.player.playerId,
+                playerId: ws.player.playerId,
                 name: ws.player.name,
                 text: msg.text
               }));
@@ -71,6 +71,45 @@ wss.on("connection", (ws) => {
         }
         break;
       case "game":
+
+        if (ws.player && typeof ws.player.room_id === "number") {
+          const room = game.rooms[ws.player.room_id];
+          if (room) {
+            console.log(msg.action);
+            // Find the player object in the room
+            const p = room.players.find(pl => pl.player_id === ws.player.playerId);
+            console.log(p);
+            if (!p) return;
+
+            console.log(p);
+            // Calculate intended new position
+            let newX = p.pos.x;
+            let newY = p.pos.y;
+            if (msg.action === "up") newY -= 1;
+            if (msg.action === "down") newY += 1;
+            if (msg.action === "left") newX -= 1;
+            if (msg.action === "right") newX += 1;
+
+            // Check for wall collision
+            if (room.map.level.rows[newY] && room.map.level.rows[newY][newX] === "empty") {
+              // valid move, update position
+              p.pos.x = newX;
+              p.pos.y = newY;
+            }
+            // else: do nothing, stay in place 
+
+            room.players.forEach(p => {
+              p.conn.send(JSON.stringify({
+                type: "game_state",
+                players: room.players.map(player => ({
+                  pos: player.pos,
+                  spriteRow: player.spriteRow,
+                  spriteCol: player.spriteCol
+                }))
+              }));
+            });
+          }
+        }
         // handle logic
         break;
       default:

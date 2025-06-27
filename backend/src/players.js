@@ -2,6 +2,21 @@ import { randomUUID } from "node:crypto";
 
 let roomId = 0
 
+const PLAYER_SPRITES = [
+  { spriteRow: 0, spriteCol: 0 }, // Player 1
+  { spriteRow: 0, spriteCol: 6 }, // Player 2
+  { spriteRow: 6, spriteCol: 0 }, // Player 3
+  { spriteRow: 6, spriteCol: 6 }  // Player 4
+];
+
+const START_POSITIONS = [
+  { x: 1, y: 1 }, // Top-left
+  { x: 13, y: 1 }, // Top-right
+  { x: 1, y: 9 }, // Bottom-left
+  { x: 13, y: 9 }  // Bottom-right
+];
+
+// You can adjust spriteRow/spriteCol for more variety!
 function broadcastRoomState(room) {
   const state = {
     type: "room_state",
@@ -14,6 +29,16 @@ function broadcastRoomState(room) {
     gameStarted: room.gameStarted,
   };
   room.players.forEach(p => p.conn.send(JSON.stringify(state)));
+}
+
+function assignPlayerPositionsAndSprites(room) {
+  room.players.forEach((player, idx) => {
+    const pos = START_POSITIONS[idx];
+    const sprite = PLAYER_SPRITES[idx];
+    player.pos = { x: pos.x, y: pos.y };
+    player.spriteRow = sprite.spriteRow;
+    player.spriteCol = sprite.spriteCol;
+  });
 }
 
 function startMainTimer(room) {
@@ -47,6 +72,7 @@ function startReadyTimer(room) {
       clearInterval(room.intervalId);
       room.intervalId = null;
       room.gameStarted = true;
+      assignPlayerPositionsAndSprites(room);
       broadcastRoomState(room);
       //trigger game start logic here
 
