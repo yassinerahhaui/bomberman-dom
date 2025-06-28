@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { map as mapString } from "./src/maps.js";
+import { map as mapString } from "./maps.js";
+import { Level } from "./game.js";
 
 let roomId = 0
 

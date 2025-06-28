@@ -12,8 +12,8 @@ function Game() {
     return ourFrame.createElement(null, null, null);
   }
   const [gameMap, setGameMap] = state.useState(null);
-  // const [left, setLeft] = state.useState(0);
-  // const [top, setTop] = state.useState(0);
+  const [left, setLeft] = state.useState(0);
+  const [top, setTop] = state.useState(0);
   const [players, setPlayers] = state.useState([]); // For player positions from backend
 
 
@@ -72,28 +72,26 @@ function Game() {
       {
         class: `cell ${cellType}`,
       },
-      // cellType === "player"
-      player
+      cellType === "player"
+      // player
+        ? ourFrame.createElement("img", {
+          class: "player-img ",
+          src: "/frontend/assets/players.png",
+          style: `
+          width: 50px;
+          height: 50px;
+            object-fit: none;
+            object-position: -${top}px -${left}px;
+            image-rendering: pixelated;
+         display: block;
+
+          `,
+        })
         // ? ourFrame.createElement("img", {
         //   class: "player-img ",
         //   src: "/frontend/assets/players.png",
-        //   style: `width: ${imageWidth}px;
-        //     object-fit: none;
-        //     object-position: -${player.spriteCol * 32}px -${player.spriteRow * 32}px;
-        //     image-rendering: pixelated;
-        //   `,
+        //   style: `width: ${imageWidth}px;top: ${top}px;left: ${left}px;`,
         // })
-        ? ourFrame.createElement("div", {
-          class: "player-circle",
-          style: `
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: ${player.color || "#3498db"};
-            margin: auto;
-            border: 2px solid #222;
-          `,
-        })
         : null
     );
   }
@@ -126,19 +124,23 @@ function Game() {
       case "ArrowUp":
       case "w":
       case "z":
+        goUp();
         action = "up";
         break;
       case "ArrowDown":
       case "s":
+        goDown();
         action = "down";
         break;
       case "ArrowLeft":
       case "a":
       case "q":
+        goLeft();
         action = "left";
         break;
       case "ArrowRight":
       case "d":
+        goRight()
         action = "right";
         break;
       case " ":
@@ -162,22 +164,23 @@ function Game() {
     },
     renderMap()
   );
-  // function goLeft() {
-  //   setTop(-(playerWidth * 2));
-  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  // }
-  // function goRight() {
-  //   setTop(-(playerWidth * 5));
-  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  // }
-  // function goUp() {
-  //   setTop(-playerWidth);
-  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  // }
-  // function goDown() {
-  //   setTop(0);
-  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  // }
+
+  function goLeft() {
+    setTop(-(playerWidth * 2));
+    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  }
+  function goRight() {
+    setTop(-(playerWidth * 5));
+    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  }
+  function goUp() {
+    setTop(-playerWidth);
+    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  }
+  function goDown() {
+    setTop(0);
+    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  }
 
   // ws.onmessage = (e) => console.log(e.data);
 

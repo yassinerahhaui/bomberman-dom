@@ -146,10 +146,10 @@ table {
 }
 
 
-/* .cell {
+.cell {
     width: 50px;
     height: 50px;
-} */
+}
 
 .wall {
     background: #666;
@@ -167,6 +167,7 @@ table {
 .player-img {
     position: absolute;
     left: 0;
+    bottom: 0;
 }
 
 /* Attend page styles */
