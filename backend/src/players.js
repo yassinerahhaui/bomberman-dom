@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { map as mapString } from "./src/maps.js";
 
 let roomId = 0
 
@@ -112,6 +113,8 @@ const handlePlayer = (name, ws, game) => {
           readyTimeLeft: 10,
           intervalId: null,
           gameStarted: false,
+          map: new Level(mapString),
+
         }
       )
       roomId++
@@ -132,6 +135,7 @@ const handlePlayer = (name, ws, game) => {
           readyTimeLeft: 10,
           intervalId: null,
           gameStarted: false,
+          map: new Level(mapString),
         }
       )
       roomId++

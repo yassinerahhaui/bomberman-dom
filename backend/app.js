@@ -10,7 +10,7 @@ const port = 8000;
 const level = new Level(map)
 
 const server = createServer((req, res) => {
-// console.log(level);
+  // console.log(level);
 
   res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
   // res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // Allowed methods
@@ -91,7 +91,7 @@ wss.on("connection", (ws) => {
             if (msg.action === "right") newX += 1;
 
             // Check for wall collision
-            if (room.map.level.rows[newY] && room.map.level.rows[newY][newX] === "empty") {
+            if (room.map.rows[newY][newX] === "empty") {
               // valid move, update position
               p.pos.x = newX;
               p.pos.y = newY;

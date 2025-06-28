@@ -44,7 +44,7 @@ function Game() {
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
     console.log(data);
-    
+
     if (data.type === "game_state") {
       setPlayers(data.players); // Assume backend sends all player positions
     }
@@ -63,10 +63,10 @@ function Game() {
   function renderCell(cellType, x, y) {
     // Render player if player is at (x, y)
     console.log(players);
-    
+
     const player = players.find(p => p.pos.x === x && p.pos.y === y);
     console.log(player);
-    
+
     return ourFrame.createElement(
       "td",
       {
@@ -74,13 +74,24 @@ function Game() {
       },
       // cellType === "player"
       player
-        ? ourFrame.createElement("img", {
-          class: "player-img ",
-          src: "/frontend/assets/players.png",
-          style: `width: ${imageWidth}px;
-            object-fit: none;
-            object-position: -${player.spriteCol * 32}px -${player.spriteRow * 32}px;
-            image-rendering: pixelated;
+        // ? ourFrame.createElement("img", {
+        //   class: "player-img ",
+        //   src: "/frontend/assets/players.png",
+        //   style: `width: ${imageWidth}px;
+        //     object-fit: none;
+        //     object-position: -${player.spriteCol * 32}px -${player.spriteRow * 32}px;
+        //     image-rendering: pixelated;
+        //   `,
+        // })
+        ? ourFrame.createElement("div", {
+          class: "player-circle",
+          style: `
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: ${player.color || "#3498db"};
+            margin: auto;
+            border: 2px solid #222;
           `,
         })
         : null
@@ -111,7 +122,7 @@ function Game() {
     let action = null;
     console.log(e.key);
     switch (e.key) {
-      
+
       case "ArrowUp":
       case "w":
       case "z":
