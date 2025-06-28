@@ -6,16 +6,16 @@ let roomId = 0
 
 const PLAYER_SPRITES = [
   { spriteRow: 0, spriteCol: 0 }, // Player 1
-  { spriteRow: 0, spriteCol: 6 }, // Player 2
-  { spriteRow: 6, spriteCol: 0 }, // Player 3
-  { spriteRow: 6, spriteCol: 6 }  // Player 4
+  { spriteRow: 0, spriteCol: 3 }, // Player 2
+  { spriteRow: 0, spriteCol: 6 }, // Player 3
+  { spriteRow: 0, spriteCol: 9 }  // Player 4
 ];
 
 const START_POSITIONS = [
   { x: 1, y: 1 }, // Top-left
-  { x: 13, y: 1 }, // Top-right
+  { x: 15, y: 1 }, // Top-right
   { x: 1, y: 9 }, // Bottom-left
-  { x: 13, y: 9 }  // Bottom-right
+  { x: 15, y: 9 }  // Bottom-right
 ];
 
 // You can adjust spriteRow/spriteCol for more variety!

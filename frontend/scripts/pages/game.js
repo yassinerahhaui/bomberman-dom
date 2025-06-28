@@ -35,6 +35,8 @@ function Game() {
       // console.log(data.level);
 
       setGameMap(data.level);
+      ws.send(JSON.stringify({ type: "game", action: "no"}));
+
     } catch (error) {
       console.error("Error fetching map:", error);
     }
@@ -62,7 +64,7 @@ function Game() {
   }
   function renderCell(cellType, x, y) {
     // Render player if player is at (x, y)
-    console.log(players);
+    // console.log(players);
 
     const player = players.find(p => p.pos.x === x && p.pos.y === y);
     console.log(player);
@@ -72,26 +74,27 @@ function Game() {
       {
         class: `cell ${cellType}`,
       },
-      cellType === "player"
-      // player
-        ? ourFrame.createElement("img", {
-          class: "player-img ",
-          src: "/frontend/assets/players.png",
-          style: `
-          width: 50px;
-          height: 50px;
-            object-fit: none;
-            object-position: -${top}px -${left}px;
-            image-rendering: pixelated;
-         display: block;
-
-          `,
-        })
+      // cellType === "player"
+      player
         // ? ourFrame.createElement("img", {
         //   class: "player-img ",
         //   src: "/frontend/assets/players.png",
-        //   style: `width: ${imageWidth}px;top: ${top}px;left: ${left}px;`,
+        //   style: `
+        //   width: 50px;
+        //   height: 50px;
+        //     object-fit: none;
+        //     object-position: -${top}px -${left}px;
+        //     image-rendering: pixelated;
+        //  display: block;
+
+        //   `,
         // })
+        ? ourFrame.createElement("img", {
+          class: "player-img ",
+          src: "/frontend/assets/players.png",
+          style: `width: ${imageWidth}px;top: -${50 * player.spriteRow}px;left: -${50 * player.spriteCol}px;`,
+          // style: `width: ${imageWidth}px;top: ${top}px;left: ${left}px;`,
+        })
         : null
     );
   }
@@ -124,7 +127,7 @@ function Game() {
       case "ArrowUp":
       case "w":
       case "z":
-        goUp();
+        // goUp();
         action = "up";
         break;
       case "ArrowDown":
@@ -160,7 +163,7 @@ function Game() {
       class: "game-container",
       tabIndex: "0",
       onkeydown: handleKeyDown,
-      style: "outline:none;" // Remove focus outline
+      // style: "outline:none;" // Remove focus outline
     },
     renderMap()
   );

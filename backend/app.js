@@ -83,19 +83,19 @@ wss.on("connection", (ws) => {
 
             console.log(p);
             // Calculate intended new position
-            let newX = p.pos.x;
-            let newY = p.pos.y;
-            if (msg.action === "up") newY -= 1;
-            if (msg.action === "down") newY += 1;
-            if (msg.action === "left") newX -= 1;
-            if (msg.action === "right") newX += 1;
+            // let newX = p.pos.x;
+            // let newY = p.pos.y;
+            // if (msg.action === "up") newY -= 1;
+            // if (msg.action === "down") newY += 1;
+            // if (msg.action === "left") newX -= 1;
+            // if (msg.action === "right") newX += 1;
 
-            // Check for wall collision
-            if (room.map.rows[newY][newX] === "empty") {
-              // valid move, update position
-              p.pos.x = newX;
-              p.pos.y = newY;
-            }
+            // // Check for wall collision
+            // if (room.map.rows[newY][newX] === "empty") {
+            //   // valid move, update position
+            //   p.pos.x = newX;
+            //   p.pos.y = newY;
+            // }
             // else: do nothing, stay in place 
 
             room.players.forEach(p => {
