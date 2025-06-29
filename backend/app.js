@@ -109,7 +109,8 @@ wss.on("connection", (ws) => {
                   level: room.map,
                   pos: player.pos,
                   spriteRow: player.spriteRow,
-                  spriteCol: player.spriteCol
+                  spriteCol: player.spriteCol,
+                  action: msg.action
                 }))
               }));
             });
