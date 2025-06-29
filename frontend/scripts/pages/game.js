@@ -41,15 +41,18 @@ function Game() {
       ]);
     } else if (data.type === "explosion") {
       // Add explosion to state for animation
-      setExplosions(explosions => [
-        ...explosions,
-        ...data.affected.map(pos => ({
-          x: pos.x,
-          y: pos.y,
-          start: Date.now(),
-          flameLength: data.flameLength
-        }))
-      ]);
+      data.affected.forEach(pos => {
+        setExplosions(explosions => [
+          ...explosions,
+          { x: pos.x, y: pos.y, start: Date.now(), flameLength: data.flameLength }
+        ]);
+        // Remove this explosion after 400ms
+        setTimeout(() => {
+          setExplosions(explosions =>
+            explosions.filter(e => !(e.x === pos.x && e.y === pos.y))
+          );
+        }, 400);
+      });
       // Optionally remove bomb from bombs state
       setBombs(bombs => bombs.filter(b => !(b.x === data.bomb.x && b.y === data.bomb.y)));
     }
@@ -71,7 +74,6 @@ function Game() {
 
     // Explosion (drawn below everything)
     const explosion = explosions.find(e => e.x === x && e.y === y);
-    console.log(explosions);
 
     if (explosion) {
       children.push(
