@@ -34,6 +34,7 @@ function broadcastRoomState(room) {
 }
 
 function assignPlayerPositionsAndSprites(room) {
+  room.map.addRandomBreaks(START_POSITIONS)
   room.players.forEach((player, idx) => {
     const pos = START_POSITIONS[idx];
     const sprite = PLAYER_SPRITES[idx];

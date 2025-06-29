@@ -21,6 +21,27 @@ var Level = class Level {
       });
     });
   }
+
+  // Add random breakable blocks, avoiding safe zones
+  addRandomBreaks(startPositions, safeRadius = 1, blockDensity = 0.3) {
+    function isInSafeZone(x, y) {
+      return startPositions.some(pos =>
+        pos.x - x <= safeRadius && pos.y - y <= safeRadius
+      );
+    }
+
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        if (
+          this.rows[y][x] === "empty" &&
+          !isInSafeZone(x, y) &&
+          Math.random() < blockDensity
+        ) {
+          this.rows[y][x] = "break";
+        }
+      }
+    }
+  }
 };
 
 var Player = class Player {
@@ -122,4 +143,4 @@ const result = {
   },
 };
 
-export {Level}
+export { Level }
