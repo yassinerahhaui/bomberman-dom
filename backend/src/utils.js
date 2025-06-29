@@ -7,6 +7,10 @@ function explodeBomb(room, bomb) {
     { dx: 1, dy: 0 },  // right
   ];
 
+  // Collect all affected positions
+  const affected = [{ x: bomb.x, y: bomb.y }];
+
+
   // Always affect the bomb's own cell
   affectCell(room, bomb.x, bomb.y);
 
@@ -18,6 +22,7 @@ function explodeBomb(room, bomb) {
 
       if (cell === "wall") break; // Stop at wall
 
+      affected.push({ x: nx, y: ny });
       affectCell(room, nx, ny);
 
       if (cell === "break") {
@@ -33,7 +38,9 @@ function explodeBomb(room, bomb) {
     p.conn.send(JSON.stringify({
       type: "explosion",
       bomb: { x: bomb.x, y: bomb.y },
-      flameLength: bomb.flameLength
+      flameLength: bomb.flameLength,
+      affected // send all affected positions
+
     }));
   });
   sendMapToRoom(room);

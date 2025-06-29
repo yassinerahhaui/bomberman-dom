@@ -41,12 +41,15 @@ function Game() {
       ]);
     } else if (data.type === "explosion") {
       // Add explosion to state for animation
-      setExplosions(explosions => [...explosions, {
-        x: data.bomb.x,
-        y: data.bomb.y,
-        start: Date.now(),
-        flameLength: data.flameLength
-      }]);
+      setExplosions(explosions => [
+        ...explosions,
+        ...data.affected.map(pos => ({
+          x: pos.x,
+          y: pos.y,
+          start: Date.now(),
+          flameLength: data.flameLength
+        }))
+      ]);
       // Optionally remove bomb from bombs state
       setBombs(bombs => bombs.filter(b => !(b.x === data.bomb.x && b.y === data.bomb.y)));
     }
@@ -64,44 +67,59 @@ function Game() {
   }
 
   function renderCell(cellType, x, y) {
-    const player = players.find(p => p.pos.x === x && p.pos.y === y);
-    let bombOrExplosionImg = ourFrame.createElement(null, null, null);
-    // Check for explosion at this cell
+    const children = [];
+
+    // Explosion (drawn below everything)
     const explosion = explosions.find(e => e.x === x && e.y === y);
-    console.log(explosion);
+    console.log(explosions);
+
     if (explosion) {
-      const elapsed = Date.now() - explosion.start;
-      const frame = Math.min(Math.floor(elapsed / 100), 5); // 0-5
-      if (frame < 5) {
-        bombOrExplosionImg = ourFrame.createElement("img", {
+      children.push(
+        ourFrame.createElement("img", {
           class: "bomb-img",
           src: "/frontend/assets/explotion.png",
           style: `
-          width: 50px; 
+          width: 50px;
           height: 50px;
           object-fit: contain;
-          object-position: -0px 0px;
+          object-position: 0px 0px;
+          position: absolute;
+          z-index: 1;
         `
-        });
-      } else {
-        setExplosions(explosions => explosions.filter(e => !(e.x === x && e.y === y)));
-        bombOrExplosionImg = null;
-      }
-    } else {
-      // Check for bomb at this cell
-      const bomb = bombs.find(b => b.x === x && b.y === y);
-      if (bomb) {
-        // Animate bomb: 6 frames, cycle every 100ms, repeat
-        bombOrExplosionImg = ourFrame.createElement("img", {
+        })
+      );
+    }
+
+    // Bomb (drawn above explosion, below player)
+    const bomb = bombs.find(b => b.x === x && b.y === y);
+    if (bomb) {
+      children.push(
+        ourFrame.createElement("img", {
           class: "bomb-img",
           src: "/frontend/assets/bomb.png",
           style: `
-          width: 50px; 
+          width: 50px;
           height: 50px;
           object-fit: contain;
+          position: absolute;
+          z-index: 2;
         `
-        });
-      }
+        })
+      );
+    }
+    // Player (drawn above everything)
+    const player = players.find(p => p.pos.x === x && p.pos.y === y);
+    if (player) {
+      children.push(
+        ourFrame.createElement("img", {
+          class: "player-img",
+          src: "/frontend/assets/players.png",
+          style: `
+         width: ${imageWidth}px;top: -${50 * player.spriteRow}px;left: -${50 * player.spriteCol}px;
+          z-index: 3;
+        `
+        })
+      );
     }
 
     return ourFrame.createElement(
@@ -109,14 +127,7 @@ function Game() {
       {
         class: `cell ${player ? "player" : cellType}`,
       },
-      bombOrExplosionImg,
-      player
-        ? ourFrame.createElement("img", {
-          class: "player-img",
-          src: "/frontend/assets/players.png",
-          style: `width: ${imageWidth}px;top: -${50 * player.spriteRow}px;left: -${50 * player.spriteCol}px;`,
-        })
-        : null
+      ...children
     );
   }
 

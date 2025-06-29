@@ -119,7 +119,7 @@ const handlePlayer = (name, ws, game) => {
           intervalId: null,
           gameStarted: false,
           map: new Level(mapString),
-
+          bombs: []
         }
       )
       roomId++
@@ -141,6 +141,7 @@ const handlePlayer = (name, ws, game) => {
           intervalId: null,
           gameStarted: false,
           map: new Level(mapString),
+          bombs: []
         }
       )
       roomId++

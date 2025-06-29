@@ -8,15 +8,11 @@ import { affectCell, explodeBomb, handleBombPlacement, sendMapToRoom } from "./s
 
 const hostname = "localhost";
 const port = 8000;
-const level = new Level(map)
 
 const server = createServer((req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Allowed headers
 
   if (req.method === "GET" && req.url === "/api/maps") {
     res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({ "level": level }));
     res.statusCode = 200;
   } else {
     res.statusCode = 200;
