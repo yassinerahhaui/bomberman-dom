@@ -12,34 +12,12 @@ function Game() {
     return ourFrame.createElement(null, null, null);
   }
   const [gameMap, setGameMap] = state.useState(null);
-  const [left, setLeft] = state.useState(0);
-  const [top, setTop] = state.useState(0);
   const [players, setPlayers] = state.useState([]); // For player positions from backend
+  const [bombs, setBombs] = state.useState([]);
+  const [explosions, setExplosions] = state.useState([]);
 
-
-  async function fetchMap() {
-    try {
-      const response = await fetch("http://localhost:8000/api/maps", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      // console.log(data.level);
-
-      setGameMap(data.level);
-      ws.send(JSON.stringify({ type: "game", action: "no"}));
-
-    } catch (error) {
-      console.error("Error fetching map:", error);
-    }
+  function fetchMap() {
+    ws.send(JSON.stringify({ type: "map" }));
   }
 
   // Listen for player updates from backend
@@ -49,6 +27,28 @@ function Game() {
 
     if (data.type === "game_state") {
       setPlayers(data.players); // Assume backend sends all player positions
+    } else if (data.type === "map") {
+      setGameMap(data.level);
+      ws.send(JSON.stringify({ type: "game", action: 'start' }));
+    } else if (data.type === "bomb_placed") {
+      setBombs(bombs => [
+        ...bombs,
+        {
+          x: data.bomb.x,
+          y: data.bomb.y,
+          placedAt: data.bomb.placedAt || Date.now()
+        }
+      ]);
+    } else if (data.type === "explosion") {
+      // Add explosion to state for animation
+      setExplosions(explosions => [...explosions, {
+        x: data.bomb.x,
+        y: data.bomb.y,
+        start: Date.now(),
+        flameLength: data.flameLength
+      }]);
+      // Optionally remove bomb from bombs state
+      setBombs(bombs => bombs.filter(b => !(b.x === data.bomb.x && b.y === data.bomb.y)));
     }
   };
 
@@ -59,41 +59,62 @@ function Game() {
 
   // Start the loop when component mounts
   if (!animationFrameId) {
-    fetchMap();
+    renderMap();
     animationFrameId = requestAnimationFrame(gameLoop);
   }
-  function renderCell(cellType, x, y) {
-    // Render player if player is at (x, y)
-    // console.log(players);
 
+  function renderCell(cellType, x, y) {
     const player = players.find(p => p.pos.x === x && p.pos.y === y);
-    console.log(player);
+    let bombOrExplosionImg = ourFrame.createElement(null, null, null);
+    // Check for explosion at this cell
+    const explosion = explosions.find(e => e.x === x && e.y === y);
+    console.log(explosion);
+    if (explosion) {
+      const elapsed = Date.now() - explosion.start;
+      const frame = Math.min(Math.floor(elapsed / 100), 5); // 0-5
+      if (frame < 5) {
+        bombOrExplosionImg = ourFrame.createElement("img", {
+          class: "bomb-img",
+          src: "/frontend/assets/explotion.png",
+          style: `
+          width: 50px; 
+          height: 50px;
+          object-fit: contain;
+          object-position: -0px 0px;
+        `
+        });
+      } else {
+        setExplosions(explosions => explosions.filter(e => !(e.x === x && e.y === y)));
+        bombOrExplosionImg = null;
+      }
+    } else {
+      // Check for bomb at this cell
+      const bomb = bombs.find(b => b.x === x && b.y === y);
+      if (bomb) {
+        // Animate bomb: 6 frames, cycle every 100ms, repeat
+        bombOrExplosionImg = ourFrame.createElement("img", {
+          class: "bomb-img",
+          src: "/frontend/assets/bomb.png",
+          style: `
+          width: 50px; 
+          height: 50px;
+          object-fit: contain;
+        `
+        });
+      }
+    }
 
     return ourFrame.createElement(
       "td",
       {
-        class: `cell ${cellType}`,
+        class: `cell ${player ? "player" : cellType}`,
       },
-      // cellType === "player"
+      bombOrExplosionImg,
       player
-        // ? ourFrame.createElement("img", {
-        //   class: "player-img ",
-        //   src: "/frontend/assets/players.png",
-        //   style: `
-        //   width: 50px;
-        //   height: 50px;
-        //     object-fit: none;
-        //     object-position: -${top}px -${left}px;
-        //     image-rendering: pixelated;
-        //  display: block;
-
-        //   `,
-        // })
         ? ourFrame.createElement("img", {
-          class: "player-img ",
+          class: "player-img",
           src: "/frontend/assets/players.png",
           style: `width: ${imageWidth}px;top: -${50 * player.spriteRow}px;left: -${50 * player.spriteCol}px;`,
-          // style: `width: ${imageWidth}px;top: ${top}px;left: ${left}px;`,
         })
         : null
     );
@@ -101,10 +122,9 @@ function Game() {
 
   function renderMap() {
     if (!gameMap) {
-      // fetchMap();
+      fetchMap();
       return ourFrame.createElement("div", null, "Loading...");
     }
-    console.log(gameMap);
 
     return ourFrame.createElement(
       "table",
@@ -123,7 +143,6 @@ function Game() {
     let action = null;
     console.log(e.key);
     switch (e.key) {
-
       case "ArrowUp":
       case "w":
       case "z":
@@ -132,18 +151,15 @@ function Game() {
         break;
       case "ArrowDown":
       case "s":
-        goDown();
         action = "down";
         break;
       case "ArrowLeft":
       case "a":
       case "q":
-        goLeft();
         action = "left";
         break;
       case "ArrowRight":
       case "d":
-        goRight()
         action = "right";
         break;
       case " ":
@@ -157,78 +173,35 @@ function Game() {
     }
   }
 
+
+
   return ourFrame.createElement(
     "div",
     {
       class: "game-container",
       tabIndex: "0",
       onkeydown: handleKeyDown,
-      // style: "outline:none;" // Remove focus outline
     },
     renderMap()
   );
 
-  function goLeft() {
-    setTop(-(playerWidth * 2));
-    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  }
-  function goRight() {
-    setTop(-(playerWidth * 5));
-    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  }
-  function goUp() {
-    setTop(-playerWidth);
-    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  }
-  function goDown() {
-    setTop(0);
-    left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  }
+  // function goLeft() {
+  //   setTop(-(playerWidth * 2));
+  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  // }
+  // function goRight() {
+  //   setTop(-(playerWidth * 5));
+  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  // }
+  // function goUp() {
+  //   setTop(-playerWidth);
+  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  // }
+  // function goDown() {
+  //   setTop(0);
+  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
+  // }
 
-  // ws.onmessage = (e) => console.log(e.data);
-
-  // return ourFrame.createElement(
-  //   "div",
-  //   {
-  //     class: "game-container",
-  //     tabIndex: "0",
-  //     onkeydown: (e) => {
-  //       switch (e.key) {
-  //         case "ArrowUp":
-  //         case "w":
-  //         case "z":
-  //           goUp();
-  //           ws.send(JSON.stringify({ type: "game", action: "ArrowUp" }));
-  //           break;
-  //         case "ArrowDown":
-  //         case "s":
-  //           goDown();
-  //           ws.send(JSON.stringify({ type: "game", action: "ArrowDown" }));
-  //           break;
-  //         case "ArrowLeft":
-  //         case "a":
-  //         case "q":
-  //           goLeft();
-  //           ws.send(JSON.stringify({ type: "game", action: "ArrowLeft" }));
-  //           break;
-  //         case "ArrowRight":
-  //         case "d":
-  //           goRight();
-  //           ws.send(JSON.stringify({ type: "game", action: "ArrowRight" }));
-  //           break;
-  //         case " ":
-  //           // bomb logic
-  //           break;
-  //         default:
-  //           break;
-  //       }
-  //     },
-  //     onKeyUp: (e) => {
-  //       setLeft(0);
-  //     },
-  //   },
-  //   renderMap()
-  // );
 }
 
 export default Game;

@@ -4,16 +4,14 @@ import { WebSocketServer } from "ws";
 import { Level } from "./src/game.js";
 import { map as mapString } from "./src/maps.js";
 import { map } from "./src/maps.js";
+import { affectCell, explodeBomb, handleBombPlacement, sendMapToRoom } from "./src/utils.js";
 
 const hostname = "localhost";
 const port = 8000;
 const level = new Level(map)
 
 const server = createServer((req, res) => {
-  // console.log(level);
-
   res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
-  // res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // Allowed methods
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Allowed headers
 
   if (req.method === "GET" && req.url === "/api/maps") {
@@ -41,6 +39,7 @@ let game = {
       intervalId: null,
       gameStarted: false,
       map: new Level(mapString),
+      bombs: []
 
     }
   ]
@@ -70,38 +69,48 @@ wss.on("connection", (ws) => {
           }
         }
         break;
+      case "map":
+        if (ws.player && typeof ws.player.room_id === "number") {
+          const room = game.rooms[ws.player.room_id];
+          sendMapToRoom(room);
+        }
+  
+        break
       case "game":
-
         if (ws.player && typeof ws.player.room_id === "number") {
           const room = game.rooms[ws.player.room_id];
           if (room) {
-            console.log(msg.action);
             // Find the player object in the room
             const p = room.players.find(pl => pl.player_id === ws.player.playerId);
-            console.log(p);
             if (!p) return;
 
-            console.log(p);
             // Calculate intended new position
-            // let newX = p.pos.x;
-            // let newY = p.pos.y;
-            // if (msg.action === "up") newY -= 1;
-            // if (msg.action === "down") newY += 1;
-            // if (msg.action === "left") newX -= 1;
-            // if (msg.action === "right") newX += 1;
+            let newX = p.pos.x;
+            let newY = p.pos.y;
+            if (msg.action === "up") newY -= 1;
+            if (msg.action === "down") newY += 1;
+            if (msg.action === "left") newX -= 1;
+            if (msg.action === "right") newX += 1;
 
-            // // Check for wall collision
-            // if (room.map.rows[newY][newX] === "empty") {
-            //   // valid move, update position
-            //   p.pos.x = newX;
-            //   p.pos.y = newY;
-            // }
+            // Check for wall collision
+            if (room.map.rows[newY][newX] === "empty") {
+              // valid move, update position
+              room.map.rows[p.pos.y][p.pos.x] = "empty"
+              room.map.rows[newY][newX] = "player"
+              p.pos.x = newX;
+              p.pos.y = newY;
+            }
+
             // else: do nothing, stay in place 
+            if (msg.action === "bomb") {
+              handleBombPlacement(room, p)
+            }
 
             room.players.forEach(p => {
               p.conn.send(JSON.stringify({
                 type: "game_state",
                 players: room.players.map(player => ({
+                  level: room.map,
                   pos: player.pos,
                   spriteRow: player.spriteRow,
                   spriteCol: player.spriteCol
@@ -132,7 +141,6 @@ wss.on("connection", (ws) => {
               name: removedPlayer.name
             }));
           });
-          // broadcastPlayerCount(room.players);
 
           // Optionally, remove empty rooms
           if (room.length === 0) {

@@ -1,135 +1,135 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 
 :root {
-    --font: "Rubik", sans-serif;
-    --cl-dark: #0a0a23;
-    --cl-light: #f8f8ff;
-    --cl-1: #1a1a40;
-    --cl-2: #483AA0;
-    --cl-3: #7C5CFC;
-    --cl-4: #FFD93D;
-    --cl-accent: #FF3D81;
-    font-size: 10px;
+  --font: "Rubik", sans-serif;
+  --cl-dark: #0a0a23;
+  --cl-light: #f8f8ff;
+  --cl-1: #1a1a40;
+  --cl-2: #483AA0;
+  --cl-3: #7C5CFC;
+  --cl-4: #FFD93D;
+  --cl-accent: #FF3D81;
+  font-size: 10px;
 }
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: var(--font);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font);
 }
 
 body {
-    min-height: 100vh;
-    background:
-        linear-gradient(135deg, var(--cl-1) 0%, var(--cl-2) 50%, var(--cl-3) 100%);
-    background-attachment: fixed;
-    color: var(--cl-4);
-    overflow-x: hidden;
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, var(--cl-1) 0%, var(--cl-2) 50%, var(--cl-3) 100%);
+  background-attachment: fixed;
+  color: var(--cl-4);
+  overflow-x: hidden;
 }
 
 .title1 {
-    font-size: 5rem;
-    font-weight: 900;
-    padding: 2.5rem 0 1.5rem 0;
-    text-align: center;
-    text-shadow: 0 0 1.2rem var(--cl-dark), 0 0 .6rem var(--cl-dark);
-    letter-spacing: 0.12em;
-    color: var(--cl-4);
-    text-transform: uppercase;
-    filter: drop-shadow(0 0 8px var(--cl-3));
+  font-size: 5rem;
+  font-weight: 900;
+  padding: 2.5rem 0 1.5rem 0;
+  text-align: center;
+  text-shadow: 0 0 1.2rem var(--cl-dark), 0 0 .6rem var(--cl-dark);
+  letter-spacing: 0.12em;
+  color: var(--cl-4);
+  text-transform: uppercase;
+  filter: drop-shadow(0 0 8px var(--cl-3));
 }
 
 .card {
-    width: 90%;
-    max-width: 60rem;
-    margin: 4rem auto;
-    background: rgba(26, 26, 64, 0.92);
-    border-radius: 1.6rem;
-    box-shadow: 0 12px 36px 0 rgba(124, 92, 252, 0.18), 0 0 0 4px var(--cl-3);
-    padding: 3.5rem 3rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 2.5px solid var(--cl-accent);
-    backdrop-filter: blur(3px);
-    position: relative;
-    overflow: hidden;
+  width: 90%;
+  max-width: 60rem;
+  margin: 4rem auto;
+  background: rgba(26, 26, 64, 0.92);
+  border-radius: 1.6rem;
+  box-shadow: 0 12px 36px 0 rgba(124, 92, 252, 0.18), 0 0 0 4px var(--cl-3);
+  padding: 3.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2.5px solid var(--cl-accent);
+  backdrop-filter: blur(3px);
+  position: relative;
+  overflow: hidden;
 }
 
 .card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 1.6rem;
-    pointer-events: none;
-    box-shadow: 0 0 60px 10px var(--cl-3);
-    opacity: 0.15;
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1.6rem;
+  pointer-events: none;
+  box-shadow: 0 0 60px 10px var(--cl-3);
+  opacity: 0.15;
 }
 
 .label-name {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--cl-4);
-    margin-bottom: 1rem;
-    letter-spacing: 0.06em;
-    display: block;
-    text-shadow: 0 2px 8px var(--cl-dark);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--cl-4);
+  margin-bottom: 1rem;
+  letter-spacing: 0.06em;
+  display: block;
+  text-shadow: 0 2px 8px var(--cl-dark);
 }
 
 .input-name {
-    width: 100%;
-    padding: 1.4rem 1.2rem;
-    outline: none;
-    font-size: 1.7rem;
-    font-weight: 600;
-    background: rgba(124, 92, 252, 0.10);
-    margin: 1.5rem 0;
-    border: 2.5px solid var(--cl-3);
-    border-radius: 0.8rem;
-    color: var(--cl-light);
-    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-    box-shadow: 0 4px 16px 0 rgba(124, 92, 252, 0.10);
+  width: 100%;
+  padding: 1.4rem 1.2rem;
+  outline: none;
+  font-size: 1.7rem;
+  font-weight: 600;
+  background: rgba(124, 92, 252, 0.10);
+  margin: 1.5rem 0;
+  border: 2.5px solid var(--cl-3);
+  border-radius: 0.8rem;
+  color: var(--cl-light);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 4px 16px 0 rgba(124, 92, 252, 0.10);
 }
 
 .input-name:focus {
-    border-color: var(--cl-accent);
-    box-shadow: 0 0 0 3px var(--cl-accent);
-    background: rgba(255, 61, 129, 0.10);
+  border-color: var(--cl-accent);
+  box-shadow: 0 0 0 3px var(--cl-accent);
+  background: rgba(255, 61, 129, 0.10);
 }
 
 .submit-btn {
-    background: linear-gradient(90deg, var(--cl-accent) 0%, var(--cl-3) 100%);
-    color: var(--cl-light);
-    font-weight: 800;
-    font-size: 2rem;
-    padding: 1.3rem 4rem;
-    border: none;
-    border-radius: 1rem;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.15rem;
-    box-shadow: 0 6px 24px 0 rgba(255, 61, 129, 0.18);
-    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-    outline: none;
-    position: relative;
-    overflow: hidden;
+  background: linear-gradient(90deg, var(--cl-accent) 0%, var(--cl-3) 100%);
+  color: var(--cl-light);
+  font-weight: 800;
+  font-size: 2rem;
+  padding: 1.3rem 4rem;
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.15rem;
+  box-shadow: 0 6px 24px 0 rgba(255, 61, 129, 0.18);
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  outline: none;
+  position: relative;
+  overflow: hidden;
 }
 
 .submit-btn:hover,
 .submit-btn:focus {
-    background: linear-gradient(90deg, var(--cl-3) 0%, var(--cl-accent) 100%);
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 12px 36px 0 rgba(255, 61, 129, 0.22);
-    filter: brightness(1.1);
+  background: linear-gradient(90deg, var(--cl-3) 0%, var(--cl-accent) 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 36px 0 rgba(255, 61, 129, 0.22);
+  filter: brightness(1.1);
 }
 
 .game-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #000;
 }
 
 /* .game-map {
@@ -141,33 +141,41 @@ body {
 
 
 table {
-    border-spacing: 0;
-    background: #222;
+  border-spacing: 0;
+  background: #222;
 }
 
 
 .cell {
-    width: 50px;
-    height: 50px;
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+  position: relative;
+}
+
+.break {
+  background: #ffb347;
+  border: 1.5px dashed #ff8800;
 }
 
 .wall {
-    background: #666;
-    border: 1px solid #999;
+  background: #666;
+  border: 1px solid #999;
 }
 
 .empty {
-    background: #222;
+  background: #222;
 }
 
 .player {
-    overflow: hidden;
-    position: relative;
+  overflow: hidden;
+  position: relative;
 }
+
 .player-img {
-    position: absolute;
-    left: 0;
-    bottom: 0;
+  position: absolute;
+  left: 0;
+  bottom: 0;
 }
 
 /* Attend page styles */
@@ -296,39 +304,47 @@ table {
   background: #357ae8;
 }
 
+.bomb-img {
+  width: 300px; /* 6 frames * 50px */
+  height: 50px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
 @media (max-width: 700px) {
-    .card {
-        max-width: 95vw;
-        padding: 2rem 1rem;
-        margin: 2rem auto;
-    }
+  .card {
+    max-width: 95vw;
+    padding: 2rem 1rem;
+    margin: 2rem auto;
+  }
 
-    .title1 {
-        font-size: 3rem;
-        padding: 1.5rem 0 1rem 0;
-    }
+  .title1 {
+    font-size: 3rem;
+    padding: 1.5rem 0 1rem 0;
+  }
 
-    .label-name {
-        font-size: 1.3rem;
-    }
+  .label-name {
+    font-size: 1.3rem;
+  }
 
-    .input-name {
-        font-size: 1.2rem;
-        padding: 1rem 0.8rem;
-    }
+  .input-name {
+    font-size: 1.2rem;
+    padding: 1rem 0.8rem;
+  }
 
-    .submit-btn {
-        font-size: 1.3rem;
-        padding: 1rem 2rem;
-    }
+  .submit-btn {
+    font-size: 1.3rem;
+    padding: 1rem 2rem;
+  }
 }
 
 @media (max-width: 400px) {
-    .card {
-        padding: 1rem 0.3rem;
-    }
+  .card {
+    padding: 1rem 0.3rem;
+  }
 
-    .title1 {
-        font-size: 2rem;
-    }
+  .title1 {
+    font-size: 2rem;
+  }
 }

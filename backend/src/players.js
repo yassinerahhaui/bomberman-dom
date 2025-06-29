@@ -38,6 +38,7 @@ function assignPlayerPositionsAndSprites(room) {
     const pos = START_POSITIONS[idx];
     const sprite = PLAYER_SPRITES[idx];
     player.pos = { x: pos.x, y: pos.y };
+    room.map.rows[pos.y][pos.x] = 'player'
     player.spriteRow = sprite.spriteRow;
     player.spriteCol = sprite.spriteCol;
   });
@@ -89,6 +90,9 @@ const handlePlayer = (name, ws, game) => {
     player_id: null,
     room_id: roomId,
     name: null,
+    bombsAvailable: 1, // Start with 1 bomb
+    lives: 3,          // Start with 3 lives
+    status: "live"
   };
 
   player.name = name;
