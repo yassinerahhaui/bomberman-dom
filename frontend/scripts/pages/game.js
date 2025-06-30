@@ -109,25 +109,25 @@ function Game() {
         })
       );
     }
-    // Player (drawn above everything)
-    const player = players.find(p => p.pos.x === x && p.pos.y === y);
-    if (player) {
-      children.push(
-        ourFrame.createElement("img", {
-          class: "player-img",
-          src: "/frontend/assets/players.png",
-          style: `
-         width: ${imageWidth}px;top: -${50 * player.spriteRow}px;left: -${50 * player.spriteCol}px;
-          z-index: 3;
-        `
-        })
-      );
-    }
+    // // Player (drawn above everything)
+    // const player = players.find(p => p.pos.x === x && p.pos.y === y);
+    // if (player) {
+    //   children.push(
+    //     ourFrame.createElement("img", {
+    //       class: "player-img",
+    //       src: "/frontend/assets/players.png",
+    //       style: `
+    //      width: ${imageWidth}px;top: -${50 * player.spriteRow}px;left: -${50 * player.spriteCol}px;
+    //       z-index: 3;
+    //     `
+    //     })
+    //   );
+    // }
 
     return ourFrame.createElement(
       "td",
       {
-        class: `cell ${player ? "player" : cellType}`,
+        class: `cell ${cellType}`,
       },
       ...children
     );
@@ -141,14 +141,34 @@ function Game() {
 
     return ourFrame.createElement(
       "table",
-      { class: "game-map", style: `width: ${scale * gameMap.width}px` },
+      { class: "game-map", style: `width: ${scale * gameMap.width}px; position: relative;` },
       ...gameMap.rows.map((row, y) =>
         ourFrame.createElement(
           "tr",
           { class: "row", style: `height: ${scale}px` },
           ...row.map((cell, x) => renderCell(cell, x, y))
         )
-      )
+      ),
+      ...renderPlayers()
+
+    );
+  }
+
+  function renderPlayers() {
+
+    return players.map(player =>
+      ourFrame.createElement("img", {
+        class: "player-img",
+        src: "/frontend/assets/avatar.png",
+        style: `
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        transform: translate(${player.pos.x * scale}px, -${(gameMap.height - player.pos.y - 1) * scale}px);
+        transition: transform 0.2s linear; /* Smooth movement */
+        z-index: 10;
+      `
+      })
     );
   }
 
@@ -192,10 +212,11 @@ function Game() {
     "div",
     {
       class: "game-container",
+      // style: `position: relative;`,
       tabIndex: "0",
       onkeydown: handleKeyDown,
     },
-    renderMap()
+    renderMap(),
   );
 
   // function goLeft() {

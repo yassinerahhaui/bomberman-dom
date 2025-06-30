@@ -35,8 +35,8 @@ let game = {
       intervalId: null,
       gameStarted: false,
       map: new Level(mapString),
-      bombs: []
-
+      bombs: [],
+      powerUp: []
     }
   ]
 }
@@ -70,7 +70,7 @@ wss.on("connection", (ws) => {
           const room = game.rooms[ws.player.room_id];
           sendMapToRoom(room);
         }
-  
+
         break
       case "game":
         if (ws.player && typeof ws.player.room_id === "number") {
