@@ -5,6 +5,7 @@ import { Level } from "./src/game.js";
 import { map as mapString } from "./src/maps.js";
 import { map } from "./src/maps.js";
 import { affectCell, explodeBomb, handleBombPlacement, sendMapToRoom } from "./src/utils.js";
+import { isCellEmpty, movePlayer, getNewPosition, handlePowerUpPickup, broadcastGameState } from "./moving.js";
 
 const hostname = "localhost";
 const port = 8000;
@@ -35,8 +36,8 @@ let game = {
       intervalId: null,
       gameStarted: false,
       map: new Level(mapString),
-      bombs: []
-
+      bombs: [],
+      powerUp: []
     }
   ]
 }
@@ -70,53 +71,32 @@ wss.on("connection", (ws) => {
           const room = game.rooms[ws.player.room_id];
           sendMapToRoom(room);
         }
-  
+
         break
       case "game":
-        if (ws.player && typeof ws.player.room_id === "number") {
-          const room = game.rooms[ws.player.room_id];
-          if (room) {
-            // Find the player object in the room
-            const p = room.players.find(pl => pl.player_id === ws.player.playerId);
-            if (!p) return;
+        if (!ws.player || typeof ws.player.room_id !== "number") break;
+        const room = game.rooms[ws.player.room_id];
+        if (!room) break;
 
-            // Calculate intended new position
-            let newX = p.pos.x;
-            let newY = p.pos.y;
-            if (msg.action === "up") newY -= 1;
-            if (msg.action === "down") newY += 1;
-            if (msg.action === "left") newX -= 1;
-            if (msg.action === "right") newX += 1;
+        const player = room.players.find(pl => pl.player_id === ws.player.playerId);
+        if (!player) break;
 
-            // Check for wall collision
-            if (room.map.rows[newY][newX] === "empty") {
-              // valid move, update position
-              room.map.rows[p.pos.y][p.pos.x] = "empty"
-              room.map.rows[newY][newX] = "player"
-              p.pos.x = newX;
-              p.pos.y = newY;
-            }
+        // Calculate intended new position
+        const { newX, newY } = getNewPosition(player.pos, msg.action);
 
-            // else: do nothing, stay in place 
-            if (msg.action === "bomb") {
-              handleBombPlacement(room, p)
-            }
-
-            room.players.forEach(p => {
-              p.conn.send(JSON.stringify({
-                type: "game_state",
-                players: room.players.map(player => ({
-                  level: room.map,
-                  pos: player.pos,
-                  spriteRow: player.spriteRow,
-                  spriteCol: player.spriteCol,
-                  action: msg.action
-                }))
-              }));
-            });
-          }
+        // Move player if possible
+        if (isCellEmpty(room, newX, newY)) {
+          movePlayer(room, player, newX, newY);
+          handlePowerUpPickup(room, player, newX, newY);
         }
-        // handle logic
+
+        // Handle bomb placement
+        if (msg.action === "bomb") {
+          handleBombPlacement(room, player);
+        }
+
+        // Broadcast updated game state
+        broadcastGameState(room);
         break;
       default:
         break;

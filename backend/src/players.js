@@ -34,11 +34,12 @@ function broadcastRoomState(room) {
 }
 
 function assignPlayerPositionsAndSprites(room) {
+  // room.map.addRandomBreaks(START_POSITIONS)
   room.players.forEach((player, idx) => {
     const pos = START_POSITIONS[idx];
     const sprite = PLAYER_SPRITES[idx];
     player.pos = { x: pos.x, y: pos.y };
-    room.map.rows[pos.y][pos.x] = 'player'
+    // room.map.rows[pos.y][pos.x] = 'player'
     player.spriteRow = sprite.spriteRow;
     player.spriteCol = sprite.spriteCol;
   });
@@ -67,7 +68,7 @@ function startMainTimer(room) {
 function startReadyTimer(room) {
   if (room.readyTimerStarted) return;
   room.readyTimerStarted = true;
-  room.readyTimeLeft = 10;
+  room.readyTimeLeft = 1;
   room.intervalId = setInterval(() => {
     room.readyTimeLeft--;
     broadcastRoomState(room);
@@ -92,6 +93,8 @@ const handlePlayer = (name, ws, game) => {
     name: null,
     bombsAvailable: 1, // Start with 1 bomb
     lives: 3,          // Start with 3 lives
+    flameLength: 1,
+    speed: 1,
     status: "live"
   };
 
@@ -113,13 +116,14 @@ const handlePlayer = (name, ws, game) => {
           players: [],
           createdAt: Date.now(),
           mainTimerStarted: false,
-          mainTimeLeft: 20,
+          mainTimeLeft: 2,
           readyTimerStarted: false,
-          readyTimeLeft: 10,
+          readyTimeLeft: 1,
           intervalId: null,
           gameStarted: false,
           map: new Level(mapString),
-          bombs: []
+          bombs: [],
+          powerUp: []
         }
       )
       roomId++
@@ -141,7 +145,8 @@ const handlePlayer = (name, ws, game) => {
           intervalId: null,
           gameStarted: false,
           map: new Level(mapString),
-          bombs: []
+          bombs: [],
+          powerUp: []
         }
       )
       roomId++
@@ -151,4 +156,4 @@ const handlePlayer = (name, ws, game) => {
 
 
 
-export { handlePlayer };
+export { handlePlayer};
