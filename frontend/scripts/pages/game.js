@@ -203,27 +203,21 @@ function Game() {
     console.log(e.key);
     switch (e.key) {
       case "ArrowUp":
-      case "w":
-      case "z":
         if (isMoving) return;
         isMoving = true; // Lock movement
         action = "up";
         break;
       case "ArrowDown":
-      case "s":
         if (isMoving) return;
         isMoving = true; // Lock movement
         action = "down";
         break;
       case "ArrowLeft":
-      case "a":
-      case "q":
         if (isMoving) return;
         isMoving = true; // Lock movement
         action = "left";
         break;
       case "ArrowRight":
-      case "d":
         if (isMoving) return;
         isMoving = true; // Lock movement
         action = "right";

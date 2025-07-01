@@ -141,8 +141,8 @@ body {
 
 
 table {
-  border-spacing: 1px;
-  background: #27cf27;
+  border-spacing: 0px;
+  background: #068506;
 }
 
 
@@ -168,9 +168,9 @@ table {
   border-radius: 4px;
 }
 
-.empty {
+/* .empty {
   background: #27cf27;
-}
+} */
 
 .player {
   overflow: hidden;
