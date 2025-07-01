@@ -27,6 +27,9 @@ function Game() {
 
     if (data.type === "game_state") {
       setPlayers(data.players); // Assume backend sends all player positions
+    } else if (data.type === "player_dead") {
+      console.log("l3ab mat oand all get warned");
+      setPlayers(players => players.filter(p => p.id !== data.playerId));
     } else if (data.type === "map") {
       setGameMap(data.level);
       ws.send(JSON.stringify({ type: "game", action: 'start' }));

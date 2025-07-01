@@ -1,3 +1,4 @@
+import { log } from "node:console";
 
 const POWER_UPS = ["bombs", "flames", "speed"];
 function explodeBomb(room, bomb) {
@@ -66,8 +67,19 @@ function affectCell(room, x, y) {
     if (player.pos.x === x && player.pos.y === y && player.lives > 0) {
       player.lives--;
       if (player.lives <= 0) {
+        console.log("daed ====> here");
+        
         player.status = "dead";
         // Optionally remove from map or handle respawn
+         room.players.forEach(p => {
+          p.conn.send(JSON.stringify({
+            type: "player_died",
+            id: player.player_id,
+             
+            x,
+            y
+          }));
+        });
       }
     }
   });
