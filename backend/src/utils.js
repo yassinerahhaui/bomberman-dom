@@ -71,6 +71,7 @@ function affectCell(room, x, y) {
         
         player.status = "dead";
         // Optionally remove from map or handle respawn
+        room.map.rows[y][x] = "empty";
          room.players.forEach(p => {
           p.conn.send(JSON.stringify({
             type: "player_died",

@@ -159,11 +159,13 @@ function Game() {
 
   function renderPlayers() {
 
-    return players.map(player =>
-      ourFrame.createElement("img", {
-        class: "player-img",
-        src: "/frontend/assets/avatar.png",
-        style: `
+    return players
+      .filter(player => player.status !== "dead") // Ma trsmsh lplayers li mato
+      .map(player =>
+        ourFrame.createElement("img", {
+          class: "player-img",
+          src: "/frontend/assets/avatar.png",
+          style: `
         width: 50px;
         height: 50px;
         object-fit: contain;
@@ -171,8 +173,8 @@ function Game() {
         transition: transform 0.2s linear; /* Smooth movement */
         z-index: 10;
       `
-      })
-    );
+        })
+      );
   }
 
   function handleKeyDown(e) {

@@ -78,7 +78,7 @@ wss.on("connection", (ws) => {
           if (room) {
             // Find the player object in the room
             const p = room.players.find(pl => pl.player_id === ws.player.playerId);
-            if (!p) return;
+            if (!p || p.status === "dead") return; 
 
             // Calculate intended new position
             let newX = p.pos.x;
@@ -109,7 +109,8 @@ wss.on("connection", (ws) => {
                   level: room.map,
                   pos: player.pos,
                   spriteRow: player.spriteRow,
-                  spriteCol: player.spriteCol
+                  spriteCol: player.spriteCol,
+                  status: player.status //
                 }))
               }));
             });
