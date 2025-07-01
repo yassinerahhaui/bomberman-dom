@@ -31,8 +31,8 @@ function explodeBomb(room, bomb) {
         room.map.rows[ny][nx] = "empty";
         if (Math.random() < 0.3) { // 30% chance, adjust as needed
           const type = POWER_UPS[Math.floor(Math.random() * POWER_UPS.length)];
-          if (!room.powerUps) room.powerUps = [];
-          room.powerUps.push({ x: nx, y: ny, type });
+          // if (!room.powerUps) room.powerUp = [];
+          room.powerUp.push({ x: nx, y: ny, type });
           room.players.forEach(p => {
             p.conn.send(JSON.stringify({
               type: "powerup_spawned",
