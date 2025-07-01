@@ -5,6 +5,7 @@ import { ws } from "../main.js";
 let imageWidth = 50 * 12; // cell width * 12
 let playerWidth = 600 / 12; // player image width / 12
 let scale = 50;
+let isMoving = false;
 
 let animationFrameId = null
 function Game() {
@@ -15,6 +16,7 @@ function Game() {
   const [players, setPlayers] = state.useState([]); // For player positions from backend
   const [bombs, setBombs] = state.useState([]);
   const [explosions, setExplosions] = state.useState([]);
+  const [powerUp, setPowerUp] = state.useState([])
 
   function fetchMap() {
     ws.send(JSON.stringify({ type: "map" }));
@@ -41,17 +43,29 @@ function Game() {
       ]);
     } else if (data.type === "explosion") {
       // Add explosion to state for animation
-      setExplosions(explosions => [
-        ...explosions,
-        ...data.affected.map(pos => ({
-          x: pos.x,
-          y: pos.y,
-          start: Date.now(),
-          flameLength: data.flameLength
-        }))
-      ]);
+      data.affected.forEach(pos => {
+        setExplosions(explosions => [
+          ...explosions,
+          { x: pos.x, y: pos.y, start: Date.now(), flameLength: data.flameLength }
+        ]);
+        // Remove this explosion after 400ms
+        setTimeout(() => {
+          setExplosions(explosions =>
+            explosions.filter(e => !(e.x === pos.x && e.y === pos.y))
+          );
+        }, 400);
+      });
       // Optionally remove bomb from bombs state
       setBombs(bombs => bombs.filter(b => !(b.x === data.bomb.x && b.y === data.bomb.y)));
+    } else if (data.type === "powerup_spawned") {
+      setPowerUp(powerUps => [
+        ...powerUps,
+        data.powerup
+      ]);
+    } else if (data.type === "powerup_taken") {
+      setPowerUp(powerUps =>
+        powerUps.filter(pu => !(pu.x === data.x && pu.y === data.y))
+      );
     }
   };
 
@@ -71,7 +85,6 @@ function Game() {
 
     // Explosion (drawn below everything)
     const explosion = explosions.find(e => e.x === x && e.y === y);
-    console.log(explosions);
 
     if (explosion) {
       children.push(
@@ -107,25 +120,40 @@ function Game() {
         })
       );
     }
-    // Player (drawn above everything)
-    const player = players.find(p => p.pos.x === x && p.pos.y === y);
-    if (player) {
+    // Power-up (drawn above bomb/explosion, below player)
+    const powerup = powerUp.find(p => p.x === x && p.y === y);
+    if (powerup) {
+      // let src = "";
+      let className = "powerup";
+      if (powerup.type === "bombs") {
+        // src = "/frontend/assets/powerup-bomb.png";
+        className += " powerup-bombs";
+      } else if (powerup.type === "flames") {
+        // src = "/frontend/assets/powerup-flame.png";
+        className += " powerup-flames";
+      } else if (powerup.type === "speed") {
+        // src = "/frontend/assets/powerup-speed.png";
+        className += " powerup-speed";
+      }
       children.push(
-        ourFrame.createElement("img", {
-          class: "player-img",
-          src: "/frontend/assets/players.png",
+        ourFrame.createElement("div", {
+          class: className,
+          // src,
           style: `
-         width: ${imageWidth}px;top: -${50 * player.spriteRow}px;left: -${50 * player.spriteCol}px;
+          width: 40px;
+          height: 40px;
+          position: absolute;
+          left: 5px;
+          top: 5px;
           z-index: 3;
         `
         })
       );
     }
-
     return ourFrame.createElement(
       "td",
       {
-        class: `cell ${player ? "player" : cellType}`,
+        class: `cell ${cellType}`,
       },
       ...children
     );
@@ -139,14 +167,34 @@ function Game() {
 
     return ourFrame.createElement(
       "table",
-      { class: "game-map", style: `width: ${scale * gameMap.width}px` },
+      { class: "game-map", style: `width: ${scale * gameMap.width}px; position: relative;` },
       ...gameMap.rows.map((row, y) =>
         ourFrame.createElement(
           "tr",
           { class: "row", style: `height: ${scale}px` },
           ...row.map((cell, x) => renderCell(cell, x, y))
         )
-      )
+      ),
+      ...renderPlayers()
+
+    );
+  }
+
+  function renderPlayers() {
+
+    return players.map((player, idx) =>
+      ourFrame.createElement("img", {
+        class: "player-img",
+        src: "/frontend/assets/avatar.png",
+        style: `
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        transform: translate(${player.pos.x * scale}px, -${(gameMap.height - player.pos.y - 1) * scale}px);
+        transition: transform 0.3s linear; /* Smooth movement */
+        z-index: 10;
+      `,
+      })
     );
   }
 
@@ -157,20 +205,27 @@ function Game() {
       case "ArrowUp":
       case "w":
       case "z":
-        // goUp();
+        if (isMoving) return;
+        isMoving = true; // Lock movement
         action = "up";
         break;
       case "ArrowDown":
       case "s":
+        if (isMoving) return;
+        isMoving = true; // Lock movement
         action = "down";
         break;
       case "ArrowLeft":
       case "a":
       case "q":
+        if (isMoving) return;
+        isMoving = true; // Lock movement
         action = "left";
         break;
       case "ArrowRight":
       case "d":
+        if (isMoving) return;
+        isMoving = true; // Lock movement
         action = "right";
         break;
       case " ":
@@ -181,6 +236,7 @@ function Game() {
     }
     if (action && ws) {
       ws.send(JSON.stringify({ type: "game", action }));
+      setTimeout(() => { isMoving = false; }, 300);
     }
   }
 
@@ -190,28 +246,12 @@ function Game() {
     "div",
     {
       class: "game-container",
+      // style: `position: relative;`,
       tabIndex: "0",
       onkeydown: handleKeyDown,
     },
-    renderMap()
+    renderMap(),
   );
-
-  // function goLeft() {
-  //   setTop(-(playerWidth * 2));
-  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  // }
-  // function goRight() {
-  //   setTop(-(playerWidth * 5));
-  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  // }
-  // function goUp() {
-  //   setTop(-playerWidth);
-  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  // }
-  // function goDown() {
-  //   setTop(0);
-  //   left > -(playerWidth * 2) ? setLeft((l) => (l -= playerWidth)) : setLeft(0);
-  // }
 
 }
 

@@ -1,4 +1,5 @@
 
+const POWER_UPS = ["bombs", "flames", "speed"];
 function explodeBomb(room, bomb) {
   const directions = [
     { dx: 0, dy: -1 }, // up
@@ -28,6 +29,17 @@ function explodeBomb(room, bomb) {
       if (cell === "break") {
         // Destroy breakable and stop flame
         room.map.rows[ny][nx] = "empty";
+        if (Math.random() < 0.3) { // 30% chance, adjust as needed
+          const type = POWER_UPS[Math.floor(Math.random() * POWER_UPS.length)];
+          // if (!room.powerUps) room.powerUp = [];
+          room.powerUp.push({ x: nx, y: ny, type });
+          room.players.forEach(p => {
+            p.conn.send(JSON.stringify({
+              type: "powerup_spawned",
+              powerup: { x: nx, y: ny, type }
+            }));
+          });
+        }
         break;
       }
     }
@@ -68,8 +80,9 @@ function handleBombPlacement(room, p) {
       x: p.pos.x,
       y: p.pos.y,
       owner: p.player_id,
-      flameLength: 2 // or get from power-up
+      flameLength: p.flameLength// or get from power-up
     };
+
     room.bombs.push(bomb);
 
     // Notify all players about the new bomb

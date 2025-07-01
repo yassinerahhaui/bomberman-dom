@@ -310,13 +310,48 @@ table {
 }
 
 .bomb-img {
-  width: 300px; /* 6 frames * 50px */
+  width: 300px;
+  /* 6 frames * 50px */
   height: 50px;
   position: absolute;
   left: 0;
   top: 0;
   pointer-events: none;
 }
+
+.powerup {
+  border-radius: 50%;
+  box-shadow: 0 0 8px #fff8;
+  animation: pop 0.3s;
+}
+
+.powerup-bombs {
+  border: 2px solid #222;
+  background: #fff;
+}
+
+.powerup-flames {
+  border: 2px solid #e25822;
+  background: #ffb347;
+  box-shadow: 0 0 12px #e25822;
+}
+
+.powerup-speed {
+  border: 2px solid #1e90ff;
+  background: #b0e0ff;
+  box-shadow: 0 0 12px #1e90ff;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.5);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
 @media (max-width: 700px) {
   .card {
     max-width: 95vw;
