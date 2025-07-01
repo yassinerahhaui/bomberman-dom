@@ -7,7 +7,7 @@ let playerWidth = 600 / 12; // player image width / 12
 let scale = 50;
 let isMoving = false;
 
-let animationFrameId = null
+let animationFrameId = null;
 function Game() {
   if (!ws) {
     return ourFrame.createElement(null, null, null);
@@ -16,7 +16,7 @@ function Game() {
   const [players, setPlayers] = state.useState([]); // For player positions from backend
   const [bombs, setBombs] = state.useState([]);
   const [explosions, setExplosions] = state.useState([]);
-  const [powerUp, setPowerUp] = state.useState([])
+  const [powerUp, setPowerUp] = state.useState([]);
 
   function fetchMap() {
     ws.send(JSON.stringify({ type: "map" }));
@@ -31,40 +31,44 @@ function Game() {
       setPlayers(data.players); // Assume backend sends all player positions
     } else if (data.type === "map") {
       setGameMap(data.level);
-      ws.send(JSON.stringify({ type: "game", action: 'start' }));
+      ws.send(JSON.stringify({ type: "game", action: "start" }));
     } else if (data.type === "bomb_placed") {
-      setBombs(bombs => [
+      setBombs((bombs) => [
         ...bombs,
         {
           x: data.bomb.x,
           y: data.bomb.y,
-          placedAt: data.bomb.placedAt || Date.now()
-        }
+          placedAt: data.bomb.placedAt || Date.now(),
+        },
       ]);
     } else if (data.type === "explosion") {
       // Add explosion to state for animation
-      data.affected.forEach(pos => {
-        setExplosions(explosions => [
+      data.affected.forEach((pos) => {
+        setExplosions((explosions) => [
           ...explosions,
-          { x: pos.x, y: pos.y, start: Date.now(), flameLength: data.flameLength }
+          {
+            x: pos.x,
+            y: pos.y,
+            start: Date.now(),
+            flameLength: data.flameLength,
+          },
         ]);
         // Remove this explosion after 400ms
         setTimeout(() => {
-          setExplosions(explosions =>
-            explosions.filter(e => !(e.x === pos.x && e.y === pos.y))
+          setExplosions((explosions) =>
+            explosions.filter((e) => !(e.x === pos.x && e.y === pos.y))
           );
         }, 400);
       });
       // Optionally remove bomb from bombs state
-      setBombs(bombs => bombs.filter(b => !(b.x === data.bomb.x && b.y === data.bomb.y)));
+      setBombs((bombs) =>
+        bombs.filter((b) => !(b.x === data.bomb.x && b.y === data.bomb.y))
+      );
     } else if (data.type === "powerup_spawned") {
-      setPowerUp(powerUps => [
-        ...powerUps,
-        data.powerup
-      ]);
+      setPowerUp((powerUps) => [...powerUps, data.powerup]);
     } else if (data.type === "powerup_taken") {
-      setPowerUp(powerUps =>
-        powerUps.filter(pu => !(pu.x === data.x && pu.y === data.y))
+      setPowerUp((powerUps) =>
+        powerUps.filter((pu) => !(pu.x === data.x && pu.y === data.y))
       );
     }
   };
@@ -84,7 +88,7 @@ function Game() {
     const children = [];
 
     // Explosion (drawn below everything)
-    const explosion = explosions.find(e => e.x === x && e.y === y);
+    const explosion = explosions.find((e) => e.x === x && e.y === y);
 
     if (explosion) {
       children.push(
@@ -98,13 +102,13 @@ function Game() {
           object-position: 0px 0px;
           position: absolute;
           z-index: 1;
-        `
+        `,
         })
       );
     }
 
     // Bomb (drawn above explosion, below player)
-    const bomb = bombs.find(b => b.x === x && b.y === y);
+    const bomb = bombs.find((b) => b.x === x && b.y === y);
     if (bomb) {
       children.push(
         ourFrame.createElement("img", {
@@ -116,12 +120,12 @@ function Game() {
           object-fit: contain;
           position: absolute;
           z-index: 2;
-        `
+        `,
         })
       );
     }
     // Power-up (drawn above bomb/explosion, below player)
-    const powerup = powerUp.find(p => p.x === x && p.y === y);
+    const powerup = powerUp.find((p) => p.x === x && p.y === y);
     if (powerup) {
       // let src = "";
       let className = "powerup";
@@ -146,7 +150,7 @@ function Game() {
           left: 5px;
           top: 5px;
           z-index: 3;
-        `
+        `,
         })
       );
     }
@@ -167,7 +171,10 @@ function Game() {
 
     return ourFrame.createElement(
       "table",
-      { class: "game-map", style: `width: ${scale * gameMap.width}px; position: relative;` },
+      {
+        class: "game-map",
+        style: `width: ${scale * gameMap.width}px; position: relative;`,
+      },
       ...gameMap.rows.map((row, y) =>
         ourFrame.createElement(
           "tr",
@@ -176,25 +183,32 @@ function Game() {
         )
       ),
       ...renderPlayers()
-
     );
   }
 
   function renderPlayers() {
-
     return players.map((player, idx) =>
-      ourFrame.createElement("img", {
-        class: "player-img",
-        src: "/frontend/assets/avatar.png",
-        style: `
-        width: 50px;
-        height: 50px;
+      ourFrame.createElement(
+        "div",
+        {
+          class: "player-box",
+          style: `
+        width: ${scale}px;
+        height: ${scale}px;
         object-fit: contain;
-        transform: translate(${player.pos.x * scale}px, -${(gameMap.height - player.pos.y - 1) * scale}px);
+        transform: translate(${player.pos.x * scale}px, -${
+            (gameMap.height - player.pos.y - 1) * scale
+          }px);
         transition: transform 0.3s linear; /* Smooth movement */
         z-index: 10;
       `,
-      })
+        },
+        ourFrame.createElement("img", {
+          class: "player-img",
+          src: "/frontend/assets/players.png",
+          style: `width: ${scale*12}px;left: -${scale*(idx*3)}px;top: 0;`
+        })
+      )
     );
   }
 
@@ -230,11 +244,11 @@ function Game() {
     }
     if (action && ws) {
       ws.send(JSON.stringify({ type: "game", action }));
-      setTimeout(() => { isMoving = false; }, 300);
+      setTimeout(() => {
+        isMoving = false;
+      }, 300);
     }
   }
-
-
 
   return ourFrame.createElement(
     "div",
@@ -244,9 +258,8 @@ function Game() {
       tabIndex: "0",
       onkeydown: handleKeyDown,
     },
-    renderMap(),
+    renderMap()
   );
-
 }
 
 export default Game;

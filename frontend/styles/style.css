@@ -177,10 +177,15 @@ table {
   position: relative;
 }
 
-.player-img {
+.player-box {
   position: absolute;
   left: 0;
   bottom: 0;
+  overflow: hidden;
+}
+
+.player-img {
+  position: absolute;
 }
 
 /* Attend page styles */

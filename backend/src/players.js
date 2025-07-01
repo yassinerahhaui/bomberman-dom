@@ -48,13 +48,13 @@ function assignPlayerPositionsAndSprites(room) {
 function startMainTimer(room) {
   if (room.mainTimerStarted) return;
   room.mainTimerStarted = true;
-  room.mainTimeLeft = 2;
+  room.mainTimeLeft = 20;
   room.intervalId = setInterval(() => {
     room.mainTimeLeft--;
     broadcastRoomState(room);
     if (room.mainTimeLeft <= 0) {
       if (room.players.length === 1) {
-        room.mainTimeLeft = 2
+        room.mainTimeLeft = 20
         broadcastRoomState(room);
         return
       }
