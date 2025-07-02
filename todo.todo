@@ -1,3 +1,7 @@
    #######################    what messing ###########
 
    // bounuss (bombe speed .., effects)
+
+
+   git pull --rebase origin oldvibe
+git push --set-upstream origin oldvibe

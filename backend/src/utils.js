@@ -67,7 +67,7 @@ function affectCell(room, x, y) {
     if (player.pos.x === x && player.pos.y === y && player.lives > 0) {
       player.lives--;
       if (player.lives <= 0) {
-        console.log("daed ====> here");
+        console.log("Player died at:", x, y);
         
         player.status = "dead";
         // Optionally remove from map or handle respawn
@@ -76,7 +76,7 @@ function affectCell(room, x, y) {
           p.conn.send(JSON.stringify({
             type: "player_died",
             id: player.player_id,
-             
+            name: player.name,
             x,
             y
           }));

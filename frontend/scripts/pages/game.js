@@ -16,10 +16,15 @@ function Game() {
   const [bombs, setBombs] = state.useState([]);
   const [explosions, setExplosions] = state.useState([]);
 
+
+  // States for game over and notifications
+  const [gameStatus, setGameStatus] = state.useState("playing"); // "playing", "dead", "won"
+  const [notifications, setNotifications] = state.useState([]); // For death notifications
+  const [currentPlayerId, setCurrentPlayerId] = state.useState(null);
+
   function fetchMap() {
     ws.send(JSON.stringify({ type: "map" }));
   }
-
   // Listen for player updates from backend
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
@@ -27,6 +32,40 @@ function Game() {
 
     if (data.type === "game_state") {
       setPlayers(data.players); // Assume backend sends all player positions
+
+      // Check if current player is dead
+      if (ws.playerId) {
+        const currentPlayer = data.players.find(p => p.id === ws.playerId);
+        if (currentPlayer && currentPlayer.status === "dead" && gameStatus !== "dead") {
+          setGameStatus("dead");
+        }
+      }
+
+    } else if (data.type === "player_died") {
+      console.log("Player died:", data.name);
+
+      // Add death notification
+      const deathMessage = `${data.name} has been eliminated!`;
+      setNotifications(notifications => [...notifications, {
+        message: deathMessage,
+        id: Date.now()
+      }]);
+
+      // Remove notification after 3 seconds
+      setTimeout(() => {
+        setNotifications(notifications =>
+          notifications.filter(notif => notif.message !== deathMessage)
+        );
+      }, 3000);
+
+      // Check if current player died
+      if (data.id === ws.playerId) {
+        setGameStatus("dead");
+      }
+
+      // Remove dead player from players list
+      setPlayers(players => players.filter(p => p.id !== data.id));
+
     } else if (data.type === "player_dead") {
       console.log("l3ab mat oand all get warned");
       setPlayers(players => players.filter(p => p.id !== data.playerId));
@@ -152,10 +191,11 @@ function Game() {
           ...row.map((cell, x) => renderCell(cell, x, y))
         )
       ),
-      ...renderPlayers()
+      ...renderPlayers(),
 
     );
   }
+
 
   function renderPlayers() {
 
@@ -177,7 +217,82 @@ function Game() {
       );
   }
 
+  // Game Over Screen Component
+  function renderGameOverScreen() {
+    return ourFrame.createElement(
+      "div",
+      {
+        class: "game-over-overlay",
+        style: `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        color: white;
+        font-size: 48px;
+        font-weight: bold;
+      `
+      },
+      ourFrame.createElement("h1", {
+        style: "color: red; font-size: 64px; margin-bottom: 20px;"
+      }, "YOU LOSE!"),
+      ourFrame.createElement("p", {
+        style: "font-size: 24px; margin-bottom: 30px;"
+      }, "Better luck next time!"),
+      ourFrame.createElement("button", {
+        style: "padding: 15px 30px; font-size: 18px; background: #ff4444; color: white; border: none; border-radius: 5px; cursor: pointer;",
+        onclick: () => {
+          // router.navigate("/");
+          window.location.href = "/"; // Temporary solution
+        }
+      }, "Back to Home")
+    );
+  }
+
+  // Notification Component
+  function renderNotifications() {
+    return ourFrame.createElement(
+      "div",
+      {
+        class: "notifications",
+        style: `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 50;
+      `
+      },
+      ...notifications.map((notif, index) =>
+        ourFrame.createElement(
+          "div",
+          {
+            key: index,
+            style: `
+            background: rgba(255, 68, 68, 0.9);
+            color: white;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            animation: slideIn 0.3s ease-out;
+          `
+          },
+          notif.message
+        )
+      )
+    );
+  }
+
   function handleKeyDown(e) {
+    // Don't allow input if game is over
+    if (gameStatus === "dead") return;
     let action = null;
     console.log(e.key);
     switch (e.key) {
@@ -222,6 +337,8 @@ function Game() {
       onkeydown: handleKeyDown,
     },
     renderMap(),
+    renderNotifications(), // Always show notifications
+    ...(gameStatus === "dead" ? [renderGameOverScreen()] : []) // Show game over when dead
   );
 
   // function goLeft() {
