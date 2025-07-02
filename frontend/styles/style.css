@@ -124,23 +124,57 @@ body {
   filter: brightness(1.1);
 }
 
+
 .game-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #000;
 }
 
-/* .game-map {
-    display: grid;
-    grid-template-columns: repeat(33, 30px);
-    grid-template-rows: repeat(11, 30px);
-    gap: 1px;
-} */
+.game-info {
+  background-color: #ffffff4f;
+  backdrop-filter: blur(5px);
+  border-radius: 6px;
+  margin: 10px 0;
+  box-shadow: 0 0 4px black, 0 0 4px black;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.player-info-img-box {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.player-info-img {
+  display: block;
+  position: absolute;
+}
+
+.player-info-username {
+  font-size: 18px;
+  font-weight: 600;
+  color: #272727;
+}
+
+.player-info-live {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 0 4px black);
+}
+
+
+
+.game-map {
+    box-shadow: 0 0 4px black, 0 0 4px black;
+}
 
 
 table {
+  position: relative;
   border-spacing: 0px;
   background: #068506;
 }

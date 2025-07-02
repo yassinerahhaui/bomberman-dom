@@ -98,6 +98,7 @@ const handlePlayer = (name, ws, game) => {
     status: "live"
   };
 
+
   player.name = name;
   player.player_id = randomUUID()
 

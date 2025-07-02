@@ -81,6 +81,14 @@ wss.on("connection", (ws) => {
         const player = room.players.find(pl => pl.player_id === ws.player.playerId);
         if (!player) break;
 
+        // send player state
+        /*
+        - lives
+        - name
+        - status
+        */
+        let players_info = room.players.map(pl => ({ lives: pl.lives, username: pl.name, status: pl.status }))
+        room.players.forEach(pl => pl.conn.send(JSON.stringify({type:"players_info", info: players_info})))
         // Calculate intended new position
         const { newX, newY } = getNewPosition(player.pos, msg.action);
 

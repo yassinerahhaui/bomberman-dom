@@ -2,8 +2,6 @@ import { ourFrame } from "../../../framework/dom.js";
 import { state } from "../../../framework/state.js";
 import { ws } from "../main.js";
 
-let imageWidth = 50 * 12; // cell width * 12
-let playerWidth = 600 / 12; // player image width / 12
 let scale = 50;
 let isMoving = false;
 
@@ -17,6 +15,7 @@ function Game() {
   const [bombs, setBombs] = state.useState([]);
   const [explosions, setExplosions] = state.useState([]);
   const [powerUp, setPowerUp] = state.useState([]);
+  const [playersInfo, setPlayersInfo] = state.useState([]);
 
   function fetchMap() {
     ws.send(JSON.stringify({ type: "map" }));
@@ -25,10 +24,12 @@ function Game() {
   // Listen for player updates from backend
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
-    console.log(data);
 
     if (data.type === "game_state") {
       setPlayers(data.players); // Assume backend sends all player positions
+    } else if (data.type == "players_info") {
+      console.log(data.info);
+      setPlayersInfo(data.info);
     } else if (data.type === "map") {
       setGameMap(data.level);
       ws.send(JSON.stringify({ type: "game", action: "start" }));
@@ -77,7 +78,6 @@ function Game() {
   function gameLoop() {
     animationFrameId = requestAnimationFrame(gameLoop);
   }
-
   // Start the loop when component mounts
   if (!animationFrameId) {
     renderMap();
@@ -163,6 +163,16 @@ function Game() {
     );
   }
 
+  function renderLives(lives) {
+    let res = [];
+    for (let i = 1; i <= lives; i++) {
+      res.push(
+        ourFrame.createElement("img", { class: "player-info-live", src: "frontend/assets/heart.png" })
+      );
+    }
+    return res
+  }
+
   function renderMap() {
     if (!gameMap) {
       fetchMap();
@@ -170,19 +180,57 @@ function Game() {
     }
 
     return ourFrame.createElement(
-      "table",
-      {
-        class: "game-map",
-        style: `width: ${scale * gameMap.width}px; position: relative;`,
-      },
-      ...gameMap.rows.map((row, y) =>
-        ourFrame.createElement(
-          "tr",
-          { class: "row", style: `height: ${scale}px` },
-          ...row.map((cell, x) => renderCell(cell, x, y))
+      "div",
+      { class: "game" },
+      ourFrame.createElement(
+        "div",
+        { class: "game-info" },
+        ...playersInfo.map((pl, idx) =>
+          ourFrame.createElement(
+            "div",
+            { style: `display: flex` },
+            ourFrame.createElement(
+              "div",
+              {
+                class: "player-info-img-box",
+                style: `width: ${scale}px; height: ${scale}px`,
+              },
+              ourFrame.createElement("img", {
+                src: "frontend/assets/players.png",
+                class: "player-info-img",
+                style: `width: ${scale * 12}px;top: 0;left: -${
+                  scale * (idx * 3)
+                }px;`,
+              })
+            ),
+            ourFrame.createElement(
+              "div",
+              { class: "player-info" },
+              ourFrame.createElement(
+                "p",
+                { class: "player-info-username" },
+                `${pl.username}`
+              ),
+              ...renderLives(pl.lives)
+            )
+          )
         )
       ),
-      ...renderPlayers()
+      ourFrame.createElement(
+        "table",
+        {
+          class: "game-map",
+          style: `width: ${scale * gameMap.width}px; position: relative;`,
+        },
+        ...gameMap.rows.map((row, y) =>
+          ourFrame.createElement(
+            "tr",
+            { class: "row", style: `height: ${scale}px` },
+            ...row.map((cell, x) => renderCell(cell, x, y))
+          )
+        ),
+        ...renderPlayers()
+      )
     );
   }
 
@@ -206,7 +254,7 @@ function Game() {
         ourFrame.createElement("img", {
           class: "player-img",
           src: "/frontend/assets/players.png",
-          style: `width: ${scale*12}px;left: -${scale*(idx*3)}px;top: 0;`
+          style: `width: ${scale * 12}px;left: -${scale * (idx * 3)}px;top: 0;`,
         })
       )
     );
