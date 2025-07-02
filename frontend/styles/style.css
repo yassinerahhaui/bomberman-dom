@@ -359,26 +359,30 @@ table {
 }
 
 .powerup {
-  border-radius: 50%;
-  box-shadow: 0 0 8px #fff8;
+  /* border-radius: 50%;
+  box-shadow: 0 0 8px #fff8; */
   animation: pop 0.3s;
 }
 
 .powerup-bombs {
-  border: 2px solid #222;
-  background: #fff;
+  background-image: url('/frontend/assets/time-bomb.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 .powerup-flames {
-  border: 2px solid #e25822;
-  background: #ffb347;
-  box-shadow: 0 0 12px #e25822;
+  background-image: url('/frontend/assets/molotov.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 .powerup-speed {
-  border: 2px solid #1e90ff;
-  background: #b0e0ff;
-  box-shadow: 0 0 12px #1e90ff;
+  background-image: url('/frontend/assets/flash.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 @keyframes pop {
