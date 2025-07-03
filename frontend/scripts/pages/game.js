@@ -226,6 +226,36 @@ function Game() {
     return res
   }
 
+  function renderSpeed(speed) {
+    let res = [];
+    for (let i = 1; i <= speed; i++) {
+      res.push(
+        ourFrame.createElement("img", { class: "player-info-live", src: "frontend/assets/flash.png" })
+      );
+    }
+    return res
+  }
+
+  function renderBombs(bombs) {
+    let res = [];
+    for (let i = 1; i <= bombs; i++) {
+      res.push(
+        ourFrame.createElement("img", { class: "player-info-live", src: "frontend/assets/time-bomb.png" })
+      );
+    }
+    return res
+  }
+
+  function renderFlames(flames) {
+    let res = [];
+    for (let i = 1; i <= flames; i++) {
+      res.push(
+        ourFrame.createElement("img", { class: "player-info-live", src: "frontend/assets/molotov.png" })
+      );
+    }
+    return res
+  }
+
   function renderMap() {
     if (!gameMap) {
       fetchMap();
@@ -263,7 +293,13 @@ function Game() {
                 { class: "player-info-username" },
                 `${pl.username}`
               ),
-              ...renderLives(pl.lives)
+              ...renderLives(pl.lives),
+              ourFrame.createElement('br'),
+              ...renderBombs(pl.bombs),
+              ourFrame.createElement('br'),
+              ...renderSpeed(pl.speed),
+              ourFrame.createElement('br'),
+              ...renderFlames(pl.flames),
             )
           )
         )
