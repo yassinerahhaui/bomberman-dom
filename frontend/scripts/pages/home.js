@@ -1,12 +1,9 @@
 import { ourFrame } from "../../../framework/dom.js";
 import { router } from "../main.js";
-import AttendPage from "./attend.js"
 import { ws, setWs } from "../main.js";
 
 const Home = () => {
-  if (!ws) {
-    setWs(new WebSocket(`ws://localhost:8000`));
-  }
+  setWs(new WebSocket(`ws://localhost:8000`));
   const HandleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);

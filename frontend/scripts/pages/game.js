@@ -1,6 +1,7 @@
 import { ourFrame } from "../../../framework/dom.js";
 import { state } from "../../../framework/state.js";
 import { ws } from "../main.js";
+import { setWs } from "../main.js";
 
 let imageWidth = 50 * 12; // cell width * 12
 let playerWidth = 600 / 12; // player image width / 12
@@ -41,7 +42,6 @@ function Game() {
           setGameStatus("dead");
         }
       }
-
     } else if (data.type === "player_died") {
       // Add death notification
       const deathMessage = `${data.name} has been eliminated!`;
@@ -56,22 +56,17 @@ function Game() {
           notifications.filter(notif => notif.message !== deathMessage)
         );
       }, 3000);
-
-      // Check if current player died
-      // if (data.id === ws.playerId) {
-      //   setGameStatus("dead");
-      // }
-
       // Remove dead player from players list
       setPlayers(players => players.filter(p => p.id !== data.id));
 
     }
     else if (data.type === "you_dead") {
       // console.log("l3ab mat oand all get warned");
-      setPlayers(players => players.filter(p => p.id !== data.id));
       setGameStatus("dead");
-
+      setPlayers(players => players.filter(p => p.id !== data.id));
+      console.log(data);
     } else if (data.type === "winner") {
+      console.log(data);
       setGameStatus("winner")
     } else if (data.type === "map") {
       setGameMap(data.level);
@@ -253,6 +248,7 @@ function Game() {
       ourFrame.createElement("button", {
         style: "padding: 15px 30px; font-size: 18px; background: #ff4444; color: white; border: none; border-radius: 5px; cursor: pointer;",
         onclick: () => {
+          ws = setWs(null)
           // router.navigate("/");
           window.location.href = "/"; // Temporary solution
         }
