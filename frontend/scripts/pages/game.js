@@ -1,5 +1,6 @@
 import { ourFrame } from "../../../framework/dom.js";
 import { state } from "../../../framework/state.js";
+import { router } from "../main.js";
 import { ws } from "../main.js";
 
 let imageWidth = 50 * 12; // cell width * 12
@@ -66,9 +67,6 @@ function Game() {
       // Remove dead player from players list
       setPlayers(players => players.filter(p => p.id !== data.id));
 
-    } else if (data.type === "player_dead") {
-      console.log("l3ab mat oand all get warned");
-      setPlayers(players => players.filter(p => p.id !== data.playerId));
     } else if (data.type === "map") {
       setGameMap(data.level);
       ws.send(JSON.stringify({ type: "game", action: 'start' }));
@@ -249,8 +247,8 @@ function Game() {
       ourFrame.createElement("button", {
         style: "padding: 15px 30px; font-size: 18px; background: #ff4444; color: white; border: none; border-radius: 5px; cursor: pointer;",
         onclick: () => {
-          // router.navigate("/");
-          window.location.href = "/"; // Temporary solution
+          router.navigate("/");
+          // window.location.href = "/"; // Temporary solution
         }
       }, "Back to Home")
     );
