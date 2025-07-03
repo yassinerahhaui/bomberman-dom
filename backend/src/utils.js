@@ -14,7 +14,8 @@ function explodeBomb(room, bomb) {
 
 
   // Always affect the bomb's own cell
-  affectCell(room, bomb.x, bomb.y);
+
+  affectCell(room, bomb.x, bomb.y, bomb);
 
   for (const dir of directions) {
     for (let i = 1; i <= bomb.flameLength; i++) {
@@ -25,15 +26,13 @@ function explodeBomb(room, bomb) {
       if (cell === "wall") break; // Stop at wall
 
       affected.push({ x: nx, y: ny });
-      affectCell(room, nx, ny);
-
+      affectCell(room, bomb.x, bomb.y, bomb);
       if (cell === "break") {
         // Destroy breakable and stop flame
         room.map.rows[ny][nx] = "empty";
         if (Math.random() < 0.3) { // 30% chance, adjust as needed
           const type = POWER_UPS[Math.floor(Math.random() * POWER_UPS.length)];
-          if (!room.powerUps) room.powerUps = [];
-          room.powerUps.push({ x: nx, y: ny, type });
+          room.powerUp.push({ x: nx, y: ny, type });
           room.players.forEach(p => {
             p.conn.send(JSON.stringify({
               type: "powerup_spawned",
@@ -60,30 +59,75 @@ function explodeBomb(room, bomb) {
 
 }
 
-// Helper: affect cell (damage player, etc.)
-function affectCell(room, x, y) {
-  // Damage any player in this cell
+function affectCell(room, x, y, bomb = null) {
+  const deadPlayers = [];
   room.players.forEach(player => {
     if (player.pos.x === x && player.pos.y === y && player.lives > 0) {
       player.lives--;
       if (player.lives <= 0) {
-        console.log("Player died at:", x, y);
-        
         player.status = "dead";
-        // Optionally remove from map or handle respawn
         room.map.rows[y][x] = "empty";
-         room.players.forEach(p => {
-          p.conn.send(JSON.stringify({
-            type: "player_died",
-            id: player.player_id,
-            name: player.name,
-            x,
-            y
-          }));
-        });
+        deadPlayers.push(player);
       }
     }
   });
+
+  // Notify about deaths
+  deadPlayers.forEach(deadPlayer => {
+    deadPlayer.conn.send(JSON.stringify({
+      type: "you_died",
+      id: deadPlayer.player_id,
+      name: deadPlayer.name,
+      x,
+      y
+    }));
+
+    room.players.forEach(p => {
+      if (p !== deadPlayer) {
+        p.conn.send(JSON.stringify({
+          type: "player_died",
+          id: deadPlayer.player_id,
+          name: deadPlayer.name,
+          x,
+          y
+        }));
+      }
+    });
+  });
+
+  // Remove dead players from the room
+  room.players = room.players.filter(p => p.lives > 0 && p.status !== "dead");
+
+  // Winner logic: if two players died at once and no one else is left, pick the non-owner as winner
+  if (room.players.length === 1 && bomb && deadPlayers.length > 0) {
+    const winner = room.players[0];
+    // If the winner is the bomb owner and there were two players left, pick the other as winner
+    if (winner.player_id === bomb.owner && deadPlayers.length === 1) {
+      // Only one died, so winner is the bomb owner (normal)
+      winner.conn.send(JSON.stringify({
+        type: "winner",
+        id: winner.player_id,
+        name: winner.name
+      }));
+    } else if (winner.player_id === bomb.owner && deadPlayers.length > 1) {
+      // Both died, so pick the non-owner from deadPlayers
+      const nonOwner = deadPlayers.find(p => p.player_id !== bomb.owner);
+      if (nonOwner) {
+        nonOwner.conn.send(JSON.stringify({
+          type: "winner",
+          id: nonOwner.player_id,
+          name: nonOwner.name
+        }));
+      }
+    } else {
+      // Winner is not the bomb owner
+      winner.conn.send(JSON.stringify({
+        type: "winner",
+        id: winner.player_id,
+        name: winner.name
+      }));
+    }
+  }
 }
 
 function handleBombPlacement(room, p) {

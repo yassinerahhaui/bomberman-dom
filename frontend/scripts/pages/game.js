@@ -25,6 +25,7 @@ function Game() {
   function fetchMap() {
     ws.send(JSON.stringify({ type: "map" }));
   }
+
   // Listen for player updates from backend
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
@@ -42,8 +43,6 @@ function Game() {
       }
 
     } else if (data.type === "player_died") {
-      console.log("Player died:", data.name);
-
       // Add death notification
       const deathMessage = `${data.name} has been eliminated!`;
       setNotifications(notifications => [...notifications, {
@@ -59,16 +58,21 @@ function Game() {
       }, 3000);
 
       // Check if current player died
-      if (data.id === ws.playerId) {
-        setGameStatus("dead");
-      }
+      // if (data.id === ws.playerId) {
+      //   setGameStatus("dead");
+      // }
 
       // Remove dead player from players list
       setPlayers(players => players.filter(p => p.id !== data.id));
 
-    } else if (data.type === "player_dead") {
-      console.log("l3ab mat oand all get warned");
-      setPlayers(players => players.filter(p => p.id !== data.playerId));
+    }
+    else if (data.type === "you_dead") {
+      // console.log("l3ab mat oand all get warned");
+      setPlayers(players => players.filter(p => p.id !== data.id));
+      setGameStatus("dead");
+
+    } else if (data.type === "winner") {
+      setGameStatus("winner")
     } else if (data.type === "map") {
       setGameMap(data.level);
       ws.send(JSON.stringify({ type: "game", action: 'start' }));
@@ -255,7 +259,42 @@ function Game() {
       }, "Back to Home")
     );
   }
-
+  function renderWinnerScreen() {
+    return ourFrame.createElement(
+      "div",
+      {
+        class: "game-winner-overlay",
+        style: `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        color: white;
+        font-size: 48px;
+        font-weight: bold;
+      `
+      },
+      ourFrame.createElement("h1", {
+        style: "color: #00ff00; font-size: 64px; margin-bottom: 20px;"
+      }, "YOU WIN!"),
+      ourFrame.createElement("p", {
+        style: "font-size: 24px; margin-bottom: 30px;"
+      }, "Congratulations, you are the last survivor!"),
+      ourFrame.createElement("button", {
+        style: "padding: 15px 30px; font-size: 18px; background: #00cc44; color: white; border: none; border-radius: 5px; cursor: pointer;",
+        onclick: () => {
+          window.location.href = "/";
+        }
+      }, "Back to Home")
+    );
+  }
   // Notification Component
   function renderNotifications() {
     return ourFrame.createElement(
@@ -338,7 +377,9 @@ function Game() {
     },
     renderMap(),
     renderNotifications(), // Always show notifications
-    ...(gameStatus === "dead" ? [renderGameOverScreen()] : []) // Show game over when dead
+    ...(gameStatus === "dead" ? [renderGameOverScreen()] : []), // Show game over when dead
+    ...(gameStatus === "winner" ? [renderWinnerScreen()] : [])
+
   );
 
   // function goLeft() {

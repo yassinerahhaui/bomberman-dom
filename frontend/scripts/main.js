@@ -4,7 +4,7 @@ import PageNotFound from "./pages/notfound.js";
 import Game from "./pages/game.js";
 import AttendPage from "./pages/attend.js";
 
-let ws = new WebSocket(`ws://localhost:8000`);  
+let ws = null
 function setWs(newWs) {
   ws = newWs;
 }
@@ -16,7 +16,8 @@ const router = new Router({
   "/404": PageNotFound
 });
 
-// if (!ws) {
-//   router.navigate("/")
-// }
+if (!ws) {
+  router.navigate("/")
+}
+
 export { router, ws, setWs };
