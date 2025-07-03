@@ -21,7 +21,7 @@ function movePlayer(room, player, x, y) {
 function handlePowerUpPickup(room, player, x, y) {
   const idx = room.powerUp?.findIndex(pu => pu.x === x && pu.y === y);
   console.log(idx, room.powerUp);
-  
+
   if (idx !== undefined && idx !== -1) {
     const powerUp = room.powerUp[idx];
     applyPowerUp(player, powerUp.type);
@@ -39,9 +39,9 @@ function handlePowerUpPickup(room, player, x, y) {
 }
 
 function applyPowerUp(player, type) {
-  if (type === "bombs") player.bombsAvailable += 1;
-  else if (type === "flames") player.flameLength += 1;
-  else if (type === "speed") player.speed += 1;
+  if (type === "bombs") player.bombsAvailable = Math.min(player.bombsAvailable + 1, 3);
+  else if (type === "flames") player.flameLength = Math.min(player.flameLength + 1, 3);
+  else if (type === "speed") player.speed = Math.min(player.speed + 1, 3);
 }
 
 function broadcastGameState(room) {
@@ -52,9 +52,11 @@ function broadcastGameState(room) {
         level: room.map,
         pos: player.pos,
         spriteRow: player.spriteRow,
-        spriteCol: player.spriteCol
-      }))
+        spriteCol: player.spriteCol,
+        speed: player.speed,
+        id: player.player_id
+      })),
     }));
   });
 }
-export {broadcastGameState, applyPowerUp, handlePowerUpPickup, getNewPosition, isCellEmpty, movePlayer}
+export { broadcastGameState, applyPowerUp, handlePowerUpPickup, getNewPosition, isCellEmpty, movePlayer }
