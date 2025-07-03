@@ -294,11 +294,11 @@ function Game() {
                 `${pl.username}`
               ),
               ...renderLives(pl.lives),
-              ourFrame.createElement('br'),
+              ourFrame.createElement('span',null, '---'),
               ...renderBombs(pl.bombs),
-              ourFrame.createElement('br'),
+              ourFrame.createElement('span',null, '---'),
               ...renderSpeed(pl.speed),
-              ourFrame.createElement('br'),
+              ourFrame.createElement('span',null, '---'),
               ...renderFlames(pl.flames),
             )
           )
