@@ -5,7 +5,7 @@ import { setWs } from "../main.js";
 
 let scale = 50;
 let isMoving = false;
-
+let speed = 1
 let animationFrameId = null;
 function Game() {
   if (!ws) {
@@ -32,14 +32,13 @@ function Game() {
 
     if (data.type === "game_state") {
       setPlayers(data.players); // Assume backend sends all player positions
-
       // Check if current player is dead
-      if (ws.playerId) {
-        const currentPlayer = data.players.find(p => p.id === ws.playerId);
-        if (currentPlayer && currentPlayer.status === "dead" && gameStatus !== "dead") {
-          setGameStatus("dead");
-        }
-      }
+      // if (ws.playerId) {
+      //   const currentPlayer = data.players.find(p => p.id === ws.playerId);
+      //   if (currentPlayer && currentPlayer.status === "dead" && gameStatus !== "dead") {
+      //     setGameStatus("dead");
+      //   }
+      // }
     } else if (data.type === "player_died") {
       // Add death notification
       const deathMessage = `${data.name} has been eliminated!`;
@@ -63,7 +62,7 @@ function Game() {
       setGameStatus("dead");
       setPlayers(players => players.filter(p => p.id !== data.id));
       console.log(data);
-    } else if (data.type === "winner") {
+    } else if (data.type === "winner" || data.type === "alone") {
       console.log(data);
       setGameStatus("winner")
     } else if (data.type == "players_info") {
@@ -110,6 +109,21 @@ function Game() {
       setPowerUp((powerUps) =>
         powerUps.filter((pu) => !(pu.x === data.x && pu.y === data.y))
       );
+    } else if (data.type === "player_disconnected") {
+      const disconnctedMessage = `${data.name} player disconnected`;
+      setNotifications(notifications => [...notifications, {
+        message: disconnctedMessage,
+        id: Date.now()
+      }]);
+
+      // Remove notification after 3 seconds
+      setTimeout(() => {
+        setNotifications(notifications =>
+          notifications.filter(notif => notif.message !== disconnctedMessage)
+        );
+      }, 3000);
+      // Remove dead player from players list
+      setPlayers(players => players.filter(p => p.id !== data.id));
     }
   };
 
@@ -237,9 +251,8 @@ function Game() {
               ourFrame.createElement("img", {
                 src: "frontend/assets/players.png",
                 class: "player-info-img",
-                style: `width: ${scale * 12}px;top: 0;left: -${
-                  scale * (idx * 3)
-                }px;`,
+                style: `width: ${scale * 12}px;top: 0;left: -${scale * (idx * 3)
+                  }px;`,
               })
             ),
             ourFrame.createElement(
@@ -274,8 +287,13 @@ function Game() {
   }
 
   function renderPlayers() {
-    return players.map((player, idx) =>
-      ourFrame.createElement(
+    console.log(speed);
+
+    return players.map((player, idx) => {
+      if (player.id === ws.playerId) {
+        speed = player.speed || 1;
+      }
+      return ourFrame.createElement(
         "div",
         {
           class: "player-box",
@@ -283,10 +301,9 @@ function Game() {
         width: ${scale}px;
         height: ${scale}px;
         object-fit: contain;
-        transform: translate(${player.pos.x * scale}px, -${
-            (gameMap.height - player.pos.y - 1) * scale
-          }px);
-        transition: transform 0.3s linear; /* Smooth movement */
+        transform: translate(${player.pos.x * scale}px, -${(gameMap.height - player.pos.y - 1) * scale
+            }px);
+        transition: transform 0.${300 / player.speed}s linear; /* Smooth movement */
         z-index: 10;
       `,
         },
@@ -294,9 +311,10 @@ function Game() {
           class: "player-img",
           src: "/frontend/assets/players.png",
           style: `width: ${scale * 12}px;left: -${scale * (idx * 3)}px;top: 0;`,
-          })
+        })
       )
-      );
+    }
+    );
   }
 
   // Game Over Screen Component
@@ -443,7 +461,7 @@ function Game() {
       ws.send(JSON.stringify({ type: "game", action }));
       setTimeout(() => {
         isMoving = false;
-      }, 300);
+      }, 300 / speed);
     }
   }
 

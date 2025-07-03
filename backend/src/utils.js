@@ -63,8 +63,6 @@ function affectCell(room, x, y) {
     console.log(x, y);
     if (player.pos.x === x && player.pos.y === y && player.lives > 0) {
       player.lives--;
-      console.log(player.lives);
-
       if (player.lives <= 0) {
         player.status = "dead";
         room.map.rows[y][x] = "empty";
@@ -72,8 +70,6 @@ function affectCell(room, x, y) {
       }
     }
   });
-  console.log(deadPlayers);
-
   // Notify about deaths
   deadPlayers.forEach(deadPlayer => {
     deadPlayer.conn.send(JSON.stringify({
@@ -121,9 +117,7 @@ function handleBombPlacement(room, p) {
       owner: p.player_id,
       flameLength: p.flameLength// or get from power-up
     };
-
     room.bombs.push(bomb);
-
     // Notify all players about the new bomb
     room.players.forEach(player => {
       player.conn.send(JSON.stringify({
@@ -141,6 +135,7 @@ function handleBombPlacement(room, p) {
     }, 2000);
   }
 }
+
 function sendMapToRoom(room) {
   if (!room) return;
   room.players.forEach(p => {

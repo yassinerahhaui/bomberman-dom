@@ -88,7 +88,7 @@ wss.on("connection", (ws) => {
         - status
         */
         let players_info = room.players.map(pl => ({ lives: pl.lives, username: pl.name, status: pl.status }))
-        room.players.forEach(pl => pl.conn.send(JSON.stringify({type:"players_info", info: players_info})))
+        room.players.forEach(pl => pl.conn.send(JSON.stringify({ type: "players_info", info: players_info })))
         // Calculate intended new position
         const { newX, newY } = getNewPosition(player.pos, msg.action);
 
@@ -126,6 +126,15 @@ wss.on("connection", (ws) => {
               name: removedPlayer.name
             }));
           });
+          
+          broadcastGameState(room)
+          if (room.length === 1) {
+            room.players[0].conn.send(JSON.stringify({
+              type: "alone",
+              name: room.players[0].name,
+              id: room.players[0].player_id
+            }));
+          }
 
           // Optionally, remove empty rooms
           if (room.length === 0) {
