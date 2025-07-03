@@ -124,25 +124,59 @@ body {
   filter: brightness(1.1);
 }
 
+
 .game-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #000;
 }
 
-/* .game-map {
-    display: grid;
-    grid-template-columns: repeat(33, 30px);
-    grid-template-rows: repeat(11, 30px);
-    gap: 1px;
-} */
+.game-info {
+  background-color: #ffffff4f;
+  backdrop-filter: blur(5px);
+  border-radius: 6px;
+  margin: 10px 0;
+  box-shadow: 0 0 4px black, 0 0 4px black;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.player-info-img-box {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.player-info-img {
+  display: block;
+  position: absolute;
+}
+
+.player-info-username {
+  font-size: 18px;
+  font-weight: 600;
+  color: #272727;
+}
+
+.player-info-live {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 0 4px black);
+}
+
+
+
+.game-map {
+    box-shadow: 0 0 4px black, 0 0 4px black;
+}
 
 
 table {
-  border-spacing: 0;
-  background: #222;
+  position: relative;
+  border-spacing: 0px;
+  background: #068506;
 }
 
 
@@ -154,28 +188,38 @@ table {
 }
 
 .break {
-  background: #ffb347;
-  border: 1.5px dashed #ff8800;
+  background-image: url('/frontend/assets/brick.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 .wall {
-  background: #666;
-  border: 1px solid #999;
+  background-image: url('/frontend/assets/wall.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  border-radius: 4px;
 }
 
-.empty {
-  background: #222;
-}
+/* .empty {
+  background: #27cf27;
+} */
 
 .player {
   overflow: hidden;
   position: relative;
 }
 
-.player-img {
+.player-box {
   position: absolute;
   left: 0;
   bottom: 0;
+  overflow: hidden;
+}
+
+.player-img {
+  position: absolute;
 }
 
 /* Attend page styles */
@@ -315,26 +359,30 @@ table {
 }
 
 .powerup {
-  border-radius: 50%;
-  box-shadow: 0 0 8px #fff8;
+  /* border-radius: 50%;
+  box-shadow: 0 0 8px #fff8; */
   animation: pop 0.3s;
 }
 
 .powerup-bombs {
-  border: 2px solid #222;
-  background: #fff;
+  background-image: url('/frontend/assets/time-bomb.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 .powerup-flames {
-  border: 2px solid #e25822;
-  background: #ffb347;
-  box-shadow: 0 0 12px #e25822;
+  background-image: url('/frontend/assets/molotov.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 .powerup-speed {
-  border: 2px solid #1e90ff;
-  background: #b0e0ff;
-  box-shadow: 0 0 12px #1e90ff;
+  background-image: url('/frontend/assets/flash.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 @keyframes pop {
