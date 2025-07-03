@@ -19,14 +19,9 @@ function Game() {
   const [explosions, setExplosions] = state.useState([]);
   const [powerUp, setPowerUp] = state.useState([])
 
-
   // States for game over and notifications
   const [gameStatus, setGameStatus] = state.useState("playing"); // "playing", "dead", "won"
   const [notifications, setNotifications] = state.useState([]); // For death notifications
-  const [currentPlayerId, setCurrentPlayerId] = state.useState(null);
-
-
-
 
   function fetchMap() {
     ws.send(JSON.stringify({ type: "map" }));
@@ -226,7 +221,6 @@ function Game() {
 
 
   function renderPlayers() {
-
     return players.map((player, idx) =>
       ourFrame.createElement("img", {
         class: "player-img",
@@ -275,7 +269,6 @@ function Game() {
       ourFrame.createElement("button", {
         style: "padding: 15px 30px; font-size: 18px; background: #ff4444; color: white; border: none; border-radius: 5px; cursor: pointer;",
         onclick: () => {
-          ws = setWs(null)
           // router.navigate("/");
           window.location.href = "/"; // Temporary solution
         }
