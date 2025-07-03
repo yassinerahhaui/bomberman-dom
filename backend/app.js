@@ -4,14 +4,24 @@ import { WebSocketServer } from "ws";
 import { Level } from "./src/game.js";
 import { map as mapString } from "./src/maps.js";
 import { map } from "./src/maps.js";
-import { affectCell, explodeBomb, handleBombPlacement, sendMapToRoom } from "./src/utils.js";
-import { isCellEmpty, movePlayer, getNewPosition, handlePowerUpPickup, broadcastGameState } from "./moving.js";
+import {
+  affectCell,
+  explodeBomb,
+  handleBombPlacement,
+  sendMapToRoom,
+} from "./src/utils.js";
+import {
+  isCellEmpty,
+  movePlayer,
+  getNewPosition,
+  handlePowerUpPickup,
+  broadcastGameState,
+} from "./moving.js";
 
 const hostname = "localhost";
 const port = 8000;
 
 const server = createServer((req, res) => {
-
   if (req.method === "GET" && req.url === "/api/maps") {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
@@ -37,10 +47,10 @@ let game = {
       gameStarted: false,
       map: new Level(mapString),
       bombs: [],
-      powerUp: []
-    }
-  ]
-}
+      powerUp: [],
+    },
+  ],
+};
 wss.on("connection", (ws) => {
   ws.on("message", (message) => {
     const buffer = new Uint8Array(message);
@@ -48,20 +58,22 @@ wss.on("connection", (ws) => {
     const msg = JSON.parse(jsonData);
     switch (msg.type) {
       case "username":
-        handlePlayer(msg.name, ws, game)
+        handlePlayer(msg.name, ws, game);
         break;
       case "chat":
         // Broadcast chat message to all players in the room
         if (ws.player && typeof ws.player.room_id === "number") {
           const room = game.rooms[ws.player.room_id];
           if (room) {
-            room.players.forEach(p => {
-              p.conn.send(JSON.stringify({
-                type: "chat",
-                playerId: ws.player.playerId,
-                name: ws.player.name,
-                text: msg.text
-              }));
+            room.players.forEach((p) => {
+              p.conn.send(
+                JSON.stringify({
+                  type: "chat",
+                  playerId: ws.player.playerId,
+                  name: ws.player.name,
+                  text: msg.text,
+                })
+              );
             });
           }
         }
@@ -72,13 +84,15 @@ wss.on("connection", (ws) => {
           sendMapToRoom(room);
         }
 
-        break
+        break;
       case "game":
         if (!ws.player || typeof ws.player.room_id !== "number") break;
         const room = game.rooms[ws.player.room_id];
         if (!room) break;
 
-        const player = room.players.find(pl => pl.player_id === ws.player.playerId);
+        const player = room.players.find(
+          (pl) => pl.player_id === ws.player.playerId
+        );
         if (!player) break;
 
         // send player state
@@ -87,8 +101,20 @@ wss.on("connection", (ws) => {
         - name
         - status
         */
-        let players_info = room.players.map(pl => ({ lives: pl.lives, username: pl.name, status: pl.status }))
-        room.players.forEach(pl => pl.conn.send(JSON.stringify({type:"players_info", info: players_info})))
+        let players_info = room.players.map((pl) => ({
+          lives: pl.lives,
+          username: pl.name,
+          status: pl.status,
+          bombs: pl.bombsAvailable,
+          speed: pl.speed,
+          flames: pl.flameLength,
+        }));
+
+        room.players.forEach((pl) =>
+          pl.conn.send(
+            JSON.stringify({ type: "players_info", info: players_info })
+          )
+        );
         // Calculate intended new position
         const { newX, newY } = getNewPosition(player.pos, msg.action);
 
@@ -116,15 +142,17 @@ wss.on("connection", (ws) => {
     if (ws.player && typeof ws.player.room_id === "number") {
       const room = game.rooms[ws.player.room_id];
       if (room) {
-        const idx = room.players.findIndex(p => p.conn === ws);
+        const idx = room.players.findIndex((p) => p.conn === ws);
         if (idx !== -1) {
           const [removedPlayer] = room.players.splice(idx, 1);
           // Notify remaining players in the room
-          room.players.forEach(p => {
-            p.conn.send(JSON.stringify({
-              type: "player_disconnected",
-              name: removedPlayer.name
-            }));
+          room.players.forEach((p) => {
+            p.conn.send(
+              JSON.stringify({
+                type: "player_disconnected",
+                name: removedPlayer.name,
+              })
+            );
           });
 
           // Optionally, remove empty rooms
