@@ -32,11 +32,12 @@ const AttendPage = () => {
             setMainTimerStarted(data.mainTimerStarted);
             setReadyTimerStarted(data.readyTimerStarted);
             setGameStarted(data.gameStarted);
+
         } else if (data.type === "chat") {
             console.log(data.playerId);
             console.log(ws.playerId);
-            
-            
+
+
             setChatMessages(msgs => [...msgs, { name: data.name, playerId: data.playerId, text: data.text }]);
         }
 

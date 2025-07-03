@@ -1,6 +1,7 @@
 import { ourFrame } from "../../../framework/dom.js";
 import { state } from "../../../framework/state.js";
 import { ws } from "../main.js";
+import { setWs } from "../main.js";
 
 let imageWidth = 50 * 12; // cell width * 12
 let playerWidth = 600 / 12; // player image width / 12
@@ -18,6 +19,15 @@ function Game() {
   const [explosions, setExplosions] = state.useState([]);
   const [powerUp, setPowerUp] = state.useState([])
 
+
+  // States for game over and notifications
+  const [gameStatus, setGameStatus] = state.useState("playing"); // "playing", "dead", "won"
+  const [notifications, setNotifications] = state.useState([]); // For death notifications
+  const [currentPlayerId, setCurrentPlayerId] = state.useState(null);
+
+
+
+
   function fetchMap() {
     ws.send(JSON.stringify({ type: "map" }));
   }
@@ -29,6 +39,40 @@ function Game() {
 
     if (data.type === "game_state") {
       setPlayers(data.players); // Assume backend sends all player positions
+
+      // Check if current player is dead
+      if (ws.playerId) {
+        const currentPlayer = data.players.find(p => p.id === ws.playerId);
+        if (currentPlayer && currentPlayer.status === "dead" && gameStatus !== "dead") {
+          setGameStatus("dead");
+        }
+      }
+    } else if (data.type === "player_died") {
+      // Add death notification
+      const deathMessage = `${data.name} has been eliminated!`;
+      setNotifications(notifications => [...notifications, {
+        message: deathMessage,
+        id: Date.now()
+      }]);
+
+      // Remove notification after 3 seconds
+      setTimeout(() => {
+        setNotifications(notifications =>
+          notifications.filter(notif => notif.message !== deathMessage)
+        );
+      }, 3000);
+      // Remove dead player from players list
+      setPlayers(players => players.filter(p => p.id !== data.id));
+
+    }
+    else if (data.type === "you_dead") {
+      // console.log("l3ab mat oand all get warned");
+      setGameStatus("dead");
+      setPlayers(players => players.filter(p => p.id !== data.id));
+      console.log(data);
+    } else if (data.type === "winner") {
+      console.log(data);
+      setGameStatus("winner")
     } else if (data.type === "map") {
       setGameMap(data.level);
       ws.send(JSON.stringify({ type: "game", action: 'start' }));
@@ -175,10 +219,11 @@ function Game() {
           ...row.map((cell, x) => renderCell(cell, x, y))
         )
       ),
-      ...renderPlayers()
+      ...renderPlayers(),
 
     );
   }
+
 
   function renderPlayers() {
 
@@ -194,11 +239,122 @@ function Game() {
         transition: transform 0.3s linear; /* Smooth movement */
         z-index: 10;
       `,
-      })
+        })
+      );
+  }
+
+  // Game Over Screen Component
+  function renderGameOverScreen() {
+    return ourFrame.createElement(
+      "div",
+      {
+        class: "game-over-overlay",
+        style: `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        color: white;
+        font-size: 48px;
+        font-weight: bold;
+      `
+      },
+      ourFrame.createElement("h1", {
+        style: "color: red; font-size: 64px; margin-bottom: 20px;"
+      }, "YOU LOSE!"),
+      ourFrame.createElement("p", {
+        style: "font-size: 24px; margin-bottom: 30px;"
+      }, "Better luck next time!"),
+      ourFrame.createElement("button", {
+        style: "padding: 15px 30px; font-size: 18px; background: #ff4444; color: white; border: none; border-radius: 5px; cursor: pointer;",
+        onclick: () => {
+          ws = setWs(null)
+          // router.navigate("/");
+          window.location.href = "/"; // Temporary solution
+        }
+      }, "Back to Home")
+    );
+  }
+  function renderWinnerScreen() {
+    return ourFrame.createElement(
+      "div",
+      {
+        class: "game-winner-overlay",
+        style: `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        color: white;
+        font-size: 48px;
+        font-weight: bold;
+      `
+      },
+      ourFrame.createElement("h1", {
+        style: "color: #00ff00; font-size: 64px; margin-bottom: 20px;"
+      }, "YOU WIN!"),
+      ourFrame.createElement("p", {
+        style: "font-size: 24px; margin-bottom: 30px;"
+      }, "Congratulations, you are the last survivor!"),
+      ourFrame.createElement("button", {
+        style: "padding: 15px 30px; font-size: 18px; background: #00cc44; color: white; border: none; border-radius: 5px; cursor: pointer;",
+        onclick: () => {
+          window.location.href = "/";
+        }
+      }, "Back to Home")
+    );
+  }
+  // Notification Component
+  function renderNotifications() {
+    return ourFrame.createElement(
+      "div",
+      {
+        class: "notifications",
+        style: `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 50;
+      `
+      },
+      ...notifications.map((notif, index) =>
+        ourFrame.createElement(
+          "div",
+          {
+            key: index,
+            style: `
+            background: rgba(255, 68, 68, 0.9);
+            color: white;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            animation: slideIn 0.3s ease-out;
+          `
+          },
+          notif.message
+        )
+      )
     );
   }
 
   function handleKeyDown(e) {
+    // Don't allow input if game is over
+    if (gameStatus === "dead") return;
     let action = null;
     console.log(e.key);
     switch (e.key) {
@@ -251,6 +407,10 @@ function Game() {
       onkeydown: handleKeyDown,
     },
     renderMap(),
+    renderNotifications(), // Always show notifications
+    ...(gameStatus === "dead" ? [renderGameOverScreen()] : []), // Show game over when dead
+    ...(gameStatus === "winner" ? [renderWinnerScreen()] : [])
+
   );
 
 }

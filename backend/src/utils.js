@@ -25,13 +25,11 @@ function explodeBomb(room, bomb) {
 
       affected.push({ x: nx, y: ny });
       affectCell(room, nx, ny);
-
       if (cell === "break") {
         // Destroy breakable and stop flame
         room.map.rows[ny][nx] = "empty";
         if (Math.random() < 0.3) { // 30% chance, adjust as needed
           const type = POWER_UPS[Math.floor(Math.random() * POWER_UPS.length)];
-          // if (!room.powerUps) room.powerUp = [];
           room.powerUp.push({ x: nx, y: ny, type });
           room.players.forEach(p => {
             p.conn.send(JSON.stringify({
@@ -56,21 +54,62 @@ function explodeBomb(room, bomb) {
     }));
   });
   sendMapToRoom(room);
-
 }
 
-// Helper: affect cell (damage player, etc.)
 function affectCell(room, x, y) {
-  // Damage any player in this cell
+  const deadPlayers = [];
   room.players.forEach(player => {
+    console.log("player", player.pos.x, player.pos.y);
+    console.log(x, y);
     if (player.pos.x === x && player.pos.y === y && player.lives > 0) {
       player.lives--;
+      console.log(player.lives);
+
       if (player.lives <= 0) {
         player.status = "dead";
-        // Optionally remove from map or handle respawn
+        room.map.rows[y][x] = "empty";
+        deadPlayers.push(player);
       }
     }
   });
+  console.log(deadPlayers);
+
+  // Notify about deaths
+  deadPlayers.forEach(deadPlayer => {
+    deadPlayer.conn.send(JSON.stringify({
+      type: "you_dead",
+      id: deadPlayer.player_id,
+      name: deadPlayer.name,
+      x,
+      y
+    }));
+
+    room.players.forEach(p => {
+      if (p !== deadPlayer) {
+        p.conn.send(JSON.stringify({
+          type: "player_died",
+          id: deadPlayer.player_id,
+          name: deadPlayer.name,
+          x,
+          y
+        }));
+      }
+    });
+  });
+
+  // Remove dead players from the room
+  room.players = room.players.filter(p => p.lives > 0 && p.status !== "dead");
+
+  // Winner logic: if two players died at once and no one else is left, pick the non-owner as winner
+  if (room.players.length === 1) {
+    const winner = room.players[0];
+    // Only one died, so winner is the bomb owner (normal)
+    winner.conn.send(JSON.stringify({
+      type: "winner",
+      id: winner.player_id,
+      name: winner.name
+    }));
+  }
 }
 
 function handleBombPlacement(room, p) {
