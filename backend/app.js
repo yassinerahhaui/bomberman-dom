@@ -3,13 +3,11 @@ import { handlePlayer } from "./src/players.js";
 import { WebSocketServer } from "ws";
 import { Level } from "./src/game.js";
 import { map as mapString } from "./src/maps.js";
-import { map } from "./src/maps.js";
 import {
-  affectCell,
-  explodeBomb,
   handleBombPlacement,
   sendMapToRoom,
 } from "./src/utils.js";
+
 import {
   isCellEmpty,
   movePlayer,
@@ -51,6 +49,7 @@ let game = {
     },
   ],
 };
+
 wss.on("connection", (ws) => {
   ws.on("message", (message) => {
     const buffer = new Uint8Array(message);
@@ -138,7 +137,6 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-    // removePlayer(users, player)
     if (ws.player && typeof ws.player.room_id === "number") {
       const room = game.rooms[ws.player.room_id];
       if (room) {

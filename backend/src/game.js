@@ -4,7 +4,7 @@ const levelChars = {
   "+": "break",
   "-": "safe"
 };
-// import { START_POSITIONS } from "./players";
+
 var Level = class Level {
   /* convert string to slice */
   constructor(map) {

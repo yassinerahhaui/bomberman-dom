@@ -7,7 +7,6 @@ const AttendPage = () => {
     if (!ws) {
         return ourFrame.createElement(null, null, null)
     }
-    // state.resetCursor()
     const [playerCount, setPlayerCount] = state.useState(1);
     const [playerNames, setPlayerNames] = state.useState([]);
     const [mainTimeLeft, setMainTimeLeft] = state.useState(20);
@@ -15,8 +14,6 @@ const AttendPage = () => {
     const [mainTimerStarted, setMainTimerStarted] = state.useState(false);
     const [readyTimerStarted, setReadyTimerStarted] = state.useState(false);
     const [gameStarted, setGameStarted] = state.useState(false);
-    // const [playerId, setPlayerddId] = state.useState(""); 
-
 
     // Chat state
     const [chatMessages, setChatMessages] = state.useState([]);
@@ -40,7 +37,6 @@ const AttendPage = () => {
 
             setChatMessages(msgs => [...msgs, { name: data.name, playerId: data.playerId, text: data.text }]);
         }
-
     }
 
     let statusText = "";
