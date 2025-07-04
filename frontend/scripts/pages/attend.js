@@ -71,7 +71,13 @@ const AttendPage = () => {
     return ourFrame.createElement(
         "main",
         { class: "main" },
-        ourFrame.createElement("h1", { class: "title1" }, "Waiting Room"),
+        ourFrame.createElement("div", { class: "title" },
+            ourFrame.createElement("h1", { class: "title1" }, "Waiting Room"),
+            ourFrame.createElement("img", {
+                src: "/frontend/assets/bomb.png",
+                class: "bomb-logo"
+            }),
+        ),
         ourFrame.createElement(
             "div",
             { class: "card attend-card" },

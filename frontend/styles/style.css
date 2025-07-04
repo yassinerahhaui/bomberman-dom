@@ -169,7 +169,7 @@ body {
 
 
 .game-map {
-    box-shadow: 0 0 4px black, 0 0 4px black;
+  box-shadow: 0 0 4px black, 0 0 4px black;
 }
 
 
@@ -429,5 +429,30 @@ table {
 
   .title1 {
     font-size: 2rem;
+  }
+}
+
+.bomb-logo {
+  font-size: 40px;
+  animation: bounce 16ms infinite;
+  width: 50px;
+  height: 50px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
   }
 }

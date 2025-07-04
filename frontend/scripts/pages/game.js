@@ -265,6 +265,13 @@ function Game() {
     return ourFrame.createElement(
       "div",
       { class: "game" },
+      ourFrame.createElement("div", { class: "title" },
+        ourFrame.createElement("h1", { class: "title1" }, "BOMBERMAN-DOM"),
+        ourFrame.createElement("img", {
+          src: "/frontend/assets/bomb.png",
+          class: "bomb-logo"
+        }),
+      ),
       ourFrame.createElement(
         "div",
         { class: "game-info" },
@@ -294,11 +301,11 @@ function Game() {
                 `${pl.username}`
               ),
               ...renderLives(pl.lives),
-              ourFrame.createElement('span',null, '---'),
+              ourFrame.createElement('span', null, '---'),
               ...renderBombs(pl.bombs),
-              ourFrame.createElement('span',null, '---'),
+              ourFrame.createElement('span', null, '---'),
               ...renderSpeed(pl.speed),
-              ourFrame.createElement('span',null, '---'),
+              ourFrame.createElement('span', null, '---'),
               ...renderFlames(pl.flames),
             )
           )
@@ -509,6 +516,7 @@ function Game() {
       tabIndex: "0",
       onkeydown: handleKeyDown,
     },
+
     renderMap(),
     renderNotifications(), // Always show notifications
     ...(gameStatus === "dead" ? [renderGameOverScreen()] : []), // Show game over when dead

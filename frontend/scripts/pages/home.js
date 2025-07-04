@@ -33,7 +33,13 @@ const Home = () => {
     {
       class: "main",
     },
-    ourFrame.createElement("h1", { class: "title1" }, "BOMBERMAN-DOM"),
+    ourFrame.createElement("div", { class: "title" },
+      ourFrame.createElement("h1", { class: "title1" }, "BOMBERMAN-DOM"),
+      ourFrame.createElement("img", {
+        src: "/frontend/assets/bomb.png",
+        class: "bomb-logo"
+      }),
+    ),
     ourFrame.createElement(
       "div",
       {
