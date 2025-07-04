@@ -147,4 +147,21 @@ function sendMapToRoom(room) {
   });
 }
 
-export { explodeBomb, affectCell, handleBombPlacement, sendMapToRoom }
+function sendPlayersInfo(room) {
+  const players_info = room.players.map((pl) => ({
+    lives: pl.lives,
+    username: pl.name,
+    status: pl.status,
+    bombs: pl.bombsAvailable,
+    index: pl.idx,
+    speed: pl.speed,
+    flames: pl.flameLength,
+  }));
+
+  room.players.forEach((pl) =>
+    pl.conn.send(
+      JSON.stringify({ type: "players_info", info: players_info })
+    )
+  );
+}
+export { explodeBomb, affectCell, handleBombPlacement, sendMapToRoom , sendPlayersInfo}

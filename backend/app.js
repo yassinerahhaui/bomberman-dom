@@ -4,6 +4,7 @@ import { WebSocketServer } from "ws";
 import { Level } from "./src/game.js";
 import { map as mapString } from "./src/maps.js";
 import {
+  sendPlayersInfo,
   handleBombPlacement,
   sendMapToRoom,
 } from "./src/utils.js";
@@ -100,21 +101,6 @@ wss.on("connection", (ws) => {
         - name
         - status
         */
-        let players_info = room.players.map((pl) => ({
-          lives: pl.lives,
-          username: pl.name,
-          status: pl.status,
-          bombs: pl.bombsAvailable,
-          index: pl.idx,
-          speed: pl.speed,
-          flames: pl.flameLength,
-        }));
-
-        room.players.forEach((pl) =>
-          pl.conn.send(
-            JSON.stringify({ type: "players_info", info: players_info })
-          )
-        );
         // Calculate intended new position
         const { newX, newY } = getNewPosition(player.pos, msg.action);
 
@@ -128,7 +114,7 @@ wss.on("connection", (ws) => {
         if (msg.action === "bomb") {
           handleBombPlacement(room, player);
         }
-
+        sendPlayersInfo(room)
         // Broadcast updated game state
         broadcastGameState(room);
         break;
@@ -163,6 +149,7 @@ wss.on("connection", (ws) => {
                 })
               );
             });
+            sendPlayersInfo(room)
             broadcastGameState(room);
 
           }
