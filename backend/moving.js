@@ -51,8 +51,7 @@ function broadcastGameState(room) {
       players: room.players.map(player => ({
         level: room.map,
         pos: player.pos,
-        spriteRow: player.spriteRow,
-        spriteCol: player.spriteCol,
+        index: player.idx,
         speed: player.speed,
         id: player.player_id
       })),

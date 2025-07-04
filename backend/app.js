@@ -105,6 +105,7 @@ wss.on("connection", (ws) => {
           username: pl.name,
           status: pl.status,
           bombs: pl.bombsAvailable,
+          index: pl.idx,
           speed: pl.speed,
           flames: pl.flameLength,
         }));
@@ -143,20 +144,33 @@ wss.on("connection", (ws) => {
         const idx = room.players.findIndex((p) => p.conn === ws);
         if (idx !== -1) {
           const [removedPlayer] = room.players.splice(idx, 1);
-          // Notify remaining players in the room
-          room.players.forEach((p) => {
-            p.conn.send(
-              JSON.stringify({
-                type: "player_disconnected",
-                name: removedPlayer.name,
-              })
-            );
-          });
+
+          if (room.players.length === 1) {
+            room.players[0].conn.send(JSON.stringify({
+              type: "alone",
+              // id: removedPlayer.player_id,
+              // name: winner.name
+            }));
+            setTimeout(() => {
+              room.players[0].conn.close();
+            }, 100);
+          } else {
+            room.players.forEach((p) => {
+              p.conn.send(
+                JSON.stringify({
+                  type: "player_disconnected",
+                  name: removedPlayer.name,
+                })
+              );
+            });
+            broadcastGameState(room);
+
+          }
 
           // Optionally, remove empty rooms
-          if (room.length === 0) {
-            delete game.rooms[ws.player.room_id];
-          }
+          // if (room.players.length === 0) {
+          //   delete game.rooms[ws.player.room_id];
+          // }
         }
       }
     }

@@ -4,12 +4,12 @@ import { Level } from "./game.js";
 
 let roomId = 0
 
-const PLAYER_SPRITES = [
-  { spriteRow: 0, spriteCol: 0 }, // Player 1
-  { spriteRow: 0, spriteCol: 3 }, // Player 2
-  { spriteRow: 0, spriteCol: 6 }, // Player 3
-  { spriteRow: 0, spriteCol: 9 }  // Player 4
-];
+// const PLAYER_SPRITES = [
+//   { spriteRow: 0, spriteCol: 0 }, // Player 1
+//   { spriteRow: 0, spriteCol: 3 }, // Player 2
+//   { spriteRow: 0, spriteCol: 6 }, // Player 3
+//   { spriteRow: 0, spriteCol: 9 }  // Player 4
+// ];
 
 const START_POSITIONS = [
   { x: 1, y: 1 }, // Top-left
@@ -37,11 +37,13 @@ function assignPlayerPositionsAndSprites(room) {
   // room.map.addRandomBreaks(START_POSITIONS)
   room.players.forEach((player, idx) => {
     const pos = START_POSITIONS[idx];
-    const sprite = PLAYER_SPRITES[idx];
+    // const sprite = PLAYER_SPRITES[idx];
     player.pos = { x: pos.x, y: pos.y };
     // room.map.rows[pos.y][pos.x] = 'player'
-    player.spriteRow = sprite.spriteRow;
-    player.spriteCol = sprite.spriteCol;
+    // player.spriteRow = sprite.spriteRow;
+    console.log(idx);
+    
+    player.idx = idx;
   });
 }
 
@@ -106,6 +108,7 @@ const handlePlayer = (name, ws, game) => {
     type: "player_added",
     playerId: player.player_id
   }))
+  // console.log(roomId);
 
   if (game.rooms[roomId].players.length < 4) {
     if (!game.rooms[roomId].readyTimerStarted) {
@@ -157,4 +160,4 @@ const handlePlayer = (name, ws, game) => {
 
 
 
-export { handlePlayer};
+export { handlePlayer };

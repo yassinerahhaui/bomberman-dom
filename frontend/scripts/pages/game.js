@@ -288,7 +288,7 @@ function Game() {
               ourFrame.createElement("img", {
                 src: "frontend/assets/players.png",
                 class: "player-info-img",
-                style: `width: ${scale * 12}px;top: 0;left: -${scale * (idx * 3)
+                style: `width: ${scale * 12}px;top: 0;left: -${scale * ( pl.index* 3)
                   }px;`,
               })
             ),
@@ -333,6 +333,8 @@ function Game() {
     console.log(speed);
 
     return players.map((player, idx) => {
+      console.log(player.idx);
+
       if (player.id === ws.playerId) {
         speed = player.speed || 1;
       }
@@ -353,7 +355,7 @@ function Game() {
         ourFrame.createElement("img", {
           class: "player-img",
           src: "/frontend/assets/players.png",
-          style: `width: ${scale * 12}px;left: -${scale * (idx * 3)}px;top: 0;`,
+          style: `width: ${scale * 12}px;left: -${scale * (player.index * 3)}px;top: 0;`,
         })
       )
     }

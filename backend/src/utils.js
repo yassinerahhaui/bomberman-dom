@@ -96,15 +96,16 @@ function affectCell(room, x, y) {
   // Remove dead players from the room
   room.players = room.players.filter(p => p.lives > 0 && p.status !== "dead");
 
-  // Winner logic: if two players died at once and no one else is left, pick the non-owner as winner
   if (room.players.length === 1) {
     const winner = room.players[0];
-    // Only one died, so winner is the bomb owner (normal)
     winner.conn.send(JSON.stringify({
       type: "winner",
       id: winner.player_id,
       name: winner.name
     }));
+    setTimeout(() => {
+      winner.conn.close();
+    }, 100);
   }
 }
 
