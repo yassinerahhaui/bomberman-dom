@@ -42,24 +42,28 @@ function assignPlayerPositionsAndSprites(room) {
     // room.map.rows[pos.y][pos.x] = 'player'
     // player.spriteRow = sprite.spriteRow;
     console.log(idx);
-    
+
     player.idx = idx;
   });
 }
 
 function startMainTimer(room) {
+  if (room.players.length < 2) {
+    return
+  }
+
   if (room.mainTimerStarted) return;
   room.mainTimerStarted = true;
   room.mainTimeLeft = 20;
   room.intervalId = setInterval(() => {
-    room.mainTimeLeft--;
     broadcastRoomState(room);
+    room.mainTimeLeft--;
     if (room.mainTimeLeft <= 0) {
-      if (room.players.length === 1) {
-        room.mainTimeLeft = 20
-        broadcastRoomState(room);
-        return
-      }
+      // if (room.players.length === 1) {
+      //   room.mainTimeLeft = 20
+      //   broadcastRoomState(room);
+      //   return
+      // }
       clearInterval(room.intervalId);
       room.intervalId = null;
       startReadyTimer(room);
@@ -70,7 +74,7 @@ function startMainTimer(room) {
 function startReadyTimer(room) {
   if (room.readyTimerStarted) return;
   room.readyTimerStarted = true;
-  room.readyTimeLeft = 1;
+  room.readyTimeLeft = 10;
   room.intervalId = setInterval(() => {
     room.readyTimeLeft--;
     broadcastRoomState(room);
@@ -80,8 +84,6 @@ function startReadyTimer(room) {
       room.gameStarted = true;
       assignPlayerPositionsAndSprites(room);
       broadcastRoomState(room);
-      //trigger game start logic here
-
     }
   }, 1000);
 }
@@ -120,9 +122,9 @@ const handlePlayer = (name, ws, game) => {
           players: [],
           createdAt: Date.now(),
           mainTimerStarted: false,
-          mainTimeLeft: 2,
+          mainTimeLeft: 20,
           readyTimerStarted: false,
-          readyTimeLeft: 1,
+          readyTimeLeft: 10,
           intervalId: null,
           gameStarted: false,
           map: new Level(mapString),
@@ -160,4 +162,4 @@ const handlePlayer = (name, ws, game) => {
 
 
 
-export { handlePlayer };
+export { handlePlayer, broadcastRoomState };

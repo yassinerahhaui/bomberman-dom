@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { handlePlayer } from "./src/players.js";
+import { handlePlayer, broadcastRoomState } from "./src/players.js";
 import { WebSocketServer } from "ws";
 import { Level } from "./src/game.js";
 import { map as mapString } from "./src/maps.js";
@@ -130,8 +130,13 @@ wss.on("connection", (ws) => {
         const idx = room.players.findIndex((p) => p.conn === ws);
         if (idx !== -1) {
           const [removedPlayer] = room.players.splice(idx, 1);
-
-          if (room.players.length === 1) {
+          if (room.players.length === 1 && !room.gameStarted) {
+            room.mainTimerStarted = false
+            room.readyTimerStarted = false;
+            clearInterval(room.intervalId);
+            room.intervalId = null;
+            broadcastRoomState(room)
+          } else if (room.players.length === 1 && room.gameStarted) {
             room.players[0].conn.send(JSON.stringify({
               type: "alone",
               // id: removedPlayer.player_id,
