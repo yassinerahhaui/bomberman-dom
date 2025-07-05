@@ -8,7 +8,7 @@ const Home = () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const name = formData.get("name");
-    if (name.trim().length > 0) {
+    if (name.trim().length > 0 && name.length <= 20) { // Validate name length
       ws.send(JSON.stringify({ type: "username", name: name }));
       e.target.reset();
     } else if (name.length > 0) {

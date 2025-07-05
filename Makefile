@@ -1,2 +1,0 @@
-run:
-	npx serve -s .
