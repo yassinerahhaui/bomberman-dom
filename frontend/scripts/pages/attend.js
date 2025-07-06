@@ -117,7 +117,8 @@ const AttendPage = () => {
                         value: chatInput,
                         oninput: handleChatInput,
                         placeholder: "Type a message...",
-                        class: "chat-input"
+                        class: "chat-input",
+                        maxLength: 255,
                     }),
                     ourFrame.createElement("button", { type: "submit", class: "chat-send-btn" }, "Send")
                 )
