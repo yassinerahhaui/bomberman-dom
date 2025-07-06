@@ -10,7 +10,7 @@ const Home = () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const name = formData.get("name");
-    if (name.trim().length > 0) {
+    if (name.trim().length > 0 && name.trim().length <=50) {
       console.log(ws.playerId);
       if (!ws.playerId) {
         ws.send(JSON.stringify({ type: "username", name: name }));
@@ -64,6 +64,7 @@ const Home = () => {
           class: "input-name",
           placeholder: "what's your name?",
           autocomplete: "off",
+          maxLength: 50,
           id: "nameInput",
         }),
         ourFrame.createElement(

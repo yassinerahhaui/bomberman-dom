@@ -34,8 +34,9 @@ const AttendPage = () => {
             console.log(data.playerId);
             console.log(ws.playerId);
 
-
-            setChatMessages(msgs => [...msgs, { name: data.name, playerId: data.playerId, text: data.text }]);
+            if (data.text.length < 255 && data.text.length > 0) {
+                setChatMessages(msgs => [...msgs, { name: data.name, playerId: data.playerId, text: data.text }]);
+            }
         }
     }
 
