@@ -59,11 +59,13 @@ wss.on("connection", (ws) => {
     
     switch (msg.type) {
       case "username":
+        if (msg.name > 50) return 
         handlePlayer(msg.name, ws, game);
         break;
       case "chat":
         // Broadcast chat message to all players in the room
         if (ws.player && typeof ws.player.room_id === "number") {
+          if (msg.text.length > 255) return
           const room = game.rooms[ws.player.room_id];
           if (room) {
             room.players.forEach((p) => {
