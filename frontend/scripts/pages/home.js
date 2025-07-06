@@ -3,13 +3,18 @@ import { router } from "../main.js";
 import { ws, setWs } from "../main.js";
 
 const Home = () => {
-  setWs(new WebSocket(`ws://localhost:8000`));
+  if (!ws) {
+    setWs(new WebSocket(`ws://localhost:8000`));
+  }
   const HandleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const name = formData.get("name");
     if (name.trim().length > 0) {
-      ws.send(JSON.stringify({ type: "username", name: name }));
+      console.log(ws.playerId);
+      if (!ws.playerId) {
+        ws.send(JSON.stringify({ type: "username", name: name }));
+      }
       e.target.reset();
     } else if (name.length > 0) {
       e.target.reset();

@@ -56,6 +56,7 @@ wss.on("connection", (ws) => {
     const buffer = new Uint8Array(message);
     const jsonData = new TextDecoder().decode(buffer);
     const msg = JSON.parse(jsonData);
+    
     switch (msg.type) {
       case "username":
         handlePlayer(msg.name, ws, game);
