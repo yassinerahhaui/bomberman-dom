@@ -348,7 +348,7 @@ function Game() {
         object-fit: contain;
         transform: translate(${player.pos.x * scale}px, -${(gameMap.height - player.pos.y - 1) * scale
             }px);
-        transition: transform 0.${300 / player.speed}s linear; /* Smooth movement */
+        transition: transform 0.${600 / player.speed}s linear; /* Smooth movement */
         z-index: 10;
       `,
         },
@@ -506,7 +506,7 @@ function Game() {
       ws.send(JSON.stringify({ type: "game", action }));
       setTimeout(() => {
         isMoving = false;
-      }, 300 / speed);
+      }, 600 / speed);
     }
   }
 

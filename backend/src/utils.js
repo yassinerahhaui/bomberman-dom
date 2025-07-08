@@ -133,7 +133,7 @@ function handleBombPlacement(room, p) {
       p.bombsAvailable++;
       // Remove bomb from room.bombs
       room.bombs = room.bombs.filter(b => b !== bomb);
-    }, 2000);
+    }, 3000);
   }
 }
 
